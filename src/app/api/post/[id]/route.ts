@@ -1,18 +1,20 @@
 import { NextRequest } from "next/server";
-import MainController from "@/controllers/post";;
+import MainController from "@/controllers/post";
 
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest) {
   try {
-    const post = await MainController.getById(params.id);
+    const id = request.nextUrl.pathname.split("/").pop()!;
+    const post = await MainController.getById(id);
     return Response.json(post);
   } catch (err: any) {
     return Response.json({ error: err.message }, { status: 404 });
   }
 }
 
-export async function PATCH(_: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest) {
   try {
-    const result = await MainController.completeIt(params.id);
+    const id = request.nextUrl.pathname.split("/").pop()!;
+    const result = await MainController.completeIt(id);
     return Response.json(result);
   } catch (err: any) {
     return Response.json({ error: err.message }, { status: 400 });
