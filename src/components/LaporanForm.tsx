@@ -31,10 +31,6 @@ export default function LaporanForm({ onSuccess }: Props) {
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-
-        // Jika form tidak valid, hentikan submit
-        if (!isFormValid) return;
-
         const body = new FormData();
         body.append("title", formData.title);
         if (formData.image) body.append("image", formData.image);
@@ -43,6 +39,7 @@ export default function LaporanForm({ onSuccess }: Props) {
         body.append("address", formData.address);
 
         await fetch("/api/post", { method: "POST", body });
+        setIsFormValid(false)
         setFormData({ title: "", image: null, lat: "", lng: "", address: "" });
         onSuccess();
     }
@@ -62,11 +59,11 @@ export default function LaporanForm({ onSuccess }: Props) {
 
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload Gambar (opsional)
+                    Upload Gambar / Video (opsional)
                 </label>
                 <input
                     type="file"
-                    accept="image/*"
+                    accept="image/*,video/*"
                     onChange={(e) =>
                         setFormData({ ...formData, image: e.target.files?.[0] || null })
                     }

@@ -70,9 +70,9 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-6">
-        <h2 className="text-2xl font-bold text-center mb-4">Daftar</h2>
+    <div className="flex justify-center items-center min-h-screen px-4">
+      <div className="w-full max-w-md rounded-xl p-6">
+        <h2 className="text-3xl font-bold text-center mb-2">Daftar</h2>
 
         {errorMessage && (
           <div className="bg-red-100 text-red-700 px-4 py-3 rounded mb-4 text-sm">
@@ -114,17 +114,17 @@ export default function SignUpForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+                className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer hover:text-green-600 text-gray-500"
                 aria-label="Toggle password"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
               </button>
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+            className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 cursor-pointer transition"
           >
             Daftar
           </button>

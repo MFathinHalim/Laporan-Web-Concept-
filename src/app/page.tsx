@@ -52,7 +52,8 @@ export default function LaporanPage() {
         },
         (err) => {
           console.error("Gagal mendapatkan lokasi:", err);
-        }
+        },
+        { enableHighAccuracy: true }  // ← ini!
       );
     }
   }, []);
@@ -60,7 +61,7 @@ export default function LaporanPage() {
     async function fetchKabupaten(lat: number, lng: number) {
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`,
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1&extratags=1`,
           { headers: { "User-Agent": "laporpak-app" } }
         );
         const data = await res.json();
@@ -236,13 +237,19 @@ export default function LaporanPage() {
       </div>
 
       <div className="p-3 max-w-5xl mx-auto">
-      <h1 className="text-4xl font-bold text-gray-800 text-center">Laporin</h1>
+        <h1 className="text-4xl font-bold text-gray-800 text-center">Laporin</h1>
 
-        {userKabupaten && (
+        {userKabupaten ? (
           <div className="flex justify-center items-center text-sm text-gray-600 mt-5 gap-1">
             <MapPin className="w-4 h-4" />
             <span>Lokasi kamu:</span>
             <strong>{userKabupaten}</strong>
+          </div>
+        ) : (
+          <div className="flex justify-center items-center text-sm text-gray-600 mt-6 gap-1">
+            <MapPin className="w-4 h-4" />
+            <div className="h-4 w-20 bg-gray-100 rounded" />
+            <div className="h-4 w-32 bg-gray-200 rounded" />
           </div>
         )}
         <div className="mt-5 mb-3 flex gap-2">
@@ -251,79 +258,104 @@ export default function LaporanPage() {
             placeholder="Cari tag..."
             value={tag}
             onChange={(e) => setTag(e.target.value)}
-            className="p-3 bg-gray-100 border border-gray-200 rounded-lg w-full text-sm focus:outline-none focus:ring focus:border-blue-300"
+            className="p-3 bg-gray-100 border border-gray-200 rounded-full px-5 w-full text-sm focus:outline-none focus:ring focus:border-blue-300"
           />
         </div>
-        <TagComponent tags={tags} />
+        <TagComponent tags={tags} onSelectTag={(name) => setTag(name)} />
         <div className="grid gap-4 mt-8">
-          {posts
-            .filter((p) => !p.completed)
-            .map((p) => (
+          {posts.length === 0
+            ? Array.from({ length: 3 }).map((_, i) => (
               <div
-                key={p._id}
-                className="p-5 rounded-xl bg-gray-100 border border-gray-200 shadow-md flex flex-col gap-4"
+                key={`loading-${i}`}
+                className="p-5 rounded-xl bg-gray-100 border border-gray-200 shadow-md flex flex-col gap-4 animate-pulse"
               >
-                <div
-                  className={`text-sm font-semibold flex items-center gap-1 ${p.completed ? "text-green-600" : "text-red-600"
-                    }`}
-                >
-                  {p.completed ? "✅ Selesai" : "❌ Belum Selesai"}
-                </div>
-
-
-                <p className="text-sm font-bold text-gray-800 whitespace-pre-line">
-                  {p.title}
-                </p>
-
+                <div className="h-4 w-32 bg-gray-300 rounded" />
+                <div className="h-6 w-1/2 bg-gray-300 rounded" />
                 <div className="flex flex-col md:flex-row gap-4">
-                  {p.image && (
-                    <img
-                      src={p.image}
-                      alt=""
-                      className="rounded w-full md:w-1/2 h-auto object-cover max-h-60"
-                    />
-                  )}
+                  <div className="w-full md:w-1/2 h-48 bg-gray-300 rounded" />
+                  <div className="w-full md:w-1/2 h-48 bg-gray-300 rounded" />
+                </div>
+                <div className="h-4 w-40 bg-gray-300 rounded" />
+                <div className="h-8 w-full bg-gray-300 rounded" />
+              </div>
+            ))
+            : posts
+              .filter((p) => !p.completed)
+              .map((p) => (
+                <div
+                  key={p._id}
+                  className="p-5 rounded-xl bg-gray-100 border border-gray-200 shadow-md flex flex-col gap-4"
+                >
+                  <div
+                    className={`text-sm font-semibold flex items-center gap-1 ${p.completed ? "text-green-600" : "text-red-600"
+                      }`}
+                  >
+                    {p.completed ? "✅ Selesai" : "❌ Belum Selesai"}
+                  </div>
 
-                  {p.location && (
-                    <div className="flex-1 min-h-[200px] w-full md:w-1/2 rounded overflow-hidden">
-                      <MapReadOnly
-                        lat={p.location.lat}
-                        lng={p.location.lng}
-                      />
+                  <p className="text-sm font-bold text-gray-800 whitespace-pre-line">
+                    {p.title}
+                  </p>
+
+                  <div className="flex flex-col md:flex-row gap-4">
+                    {p.image && (
+                      p.image.match(/\.(mp4|webm|ogg)$/i) ? (
+                        <video
+                          src={p.image}
+                          controls
+                          className="rounded w-full md:w-1/2 h-auto object-cover max-h-60"
+                        />
+                      ) : (
+                        <img
+                          src={p.image}
+                          alt=""
+                          className="rounded w-full md:w-1/2 h-auto object-cover max-h-60"
+                        />
+                      )
+                    )}
+
+
+                    {p.location && (
+                      <div className="flex-1 min-h-[200px] w-full md:w-1/2 rounded overflow-hidden">
+                        <MapReadOnly
+                          lat={p.location.coordinates[1]}
+                          lng={p.location.coordinates[0]}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {p.location?.address && (
+                    <div className="text-sm text-gray-500 flex items-center gap-1">
+                      <MapPin className="w-4 h-4" /> {p.location.address}
                     </div>
                   )}
-                </div>
 
-                {p.location?.address && (
-                  <div className="text-sm text-gray-500 flex items-center gap-1">
-                    <MapPin className="w-4 h-4" /> {p.location.address}
+                  <div className="text-sm text-gray-500">
+                    Tags: {p.tags.map((t) => `#${t}`).join(" ")}
                   </div>
-                )}
 
-                <div className="text-sm text-gray-500">
-                  Tags: {p.tags.map((t) => `#${t}`).join(" ")}
-                </div>
-
-                <div className="flex flex-wrap gap-3 text-sm">
-                  <a
-                    href={`/laporan/${p._id}`}
-                    className="bg-black rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
-                  >
-                    <Eye className="w-4 h-4" /> Lihat Detail
-                  </a>
-
-                  {user?.atmin && !p.completed && (
-                    <button
-                      onClick={() => markAsCompleted(p._id)}
-                      className="bg-green-500 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
+                  <div className="flex flex-wrap gap-3 text-sm">
+                    <a
+                      href={`/laporan/${p._id}`}
+                      className="bg-black rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
                     >
-                      <CheckCircle2 className="w-4 h-4" /> Tandai Selesai
-                    </button>
-                  )}
+                      <Eye className="w-4 h-4" /> Lihat Detail
+                    </a>
+
+                    {user?.atmin && !p.completed && (
+                      <button
+                        onClick={() => markAsCompleted(p._id)}
+                        className="bg-green-500 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
+                      >
+                        <CheckCircle2 className="w-4 h-4" /> Tandai Selesai
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
         </div>
+
         {loading && (
           <p className="text-center text-gray-500 mt-4">⏳ Memuat data...</p>
         )}

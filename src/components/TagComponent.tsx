@@ -1,10 +1,14 @@
-import { useState, useRef } from "react";
+import { useRef } from "react";
 
-const TagComponent = ({ tags }: { tags: any[] }) => {
-  const [tag, setTag] = useState("");
+const TagComponent = ({
+  tags,
+  onSelectTag,
+}: {
+  tags: any[];
+  onSelectTag: (tag: string) => void;
+}) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Handle Grab Scroll
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollContainerRef.current) return;
 
@@ -27,30 +31,38 @@ const TagComponent = ({ tags }: { tags: any[] }) => {
     document.addEventListener("mouseup", handleMouseUp);
   };
 
+  const isLoading = tags.length === 0;
+
   return (
-    <div style={{ position: 'relative', height: 'fit-content' }}>
+    <div style={{ position: "relative", height: "fit-content" }}>
       <span className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-white via-transparent to-transparent z-10 pointer-events-none"></span>
 
       <div
-        className="mb-4 flex gap-2 overflow-x-auto relative"
+        className="mb-4 flex gap-2 pr-8 overflow-x-auto relative"
         ref={scrollContainerRef}
         onMouseDown={handleMouseDown}
         style={{
           cursor: "grab",
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
         }}
       >
-        {/* Konten tags */}
-        {tags.map((t: any, i) => (
-          <button
-            key={i}
-            className="bg-gray border cursor-pointer border-gray-300 px-3 py-1 rounded-lg hover:bg-gray-200"
-            onClick={() => setTag(t.name)}
-          >
-            {t.name}
-          </button>
-        ))}
+        {isLoading
+          ? Array.from({ length: 12 }).map((_, i) => (
+              <div
+                key={`loading-${i}`}
+                className="bg-gray-100 animate-pulse border border-dashed border-gray-300 px-3 py-1 rounded-lg w-20 h-8"
+              />
+            ))
+          : tags.map((t: any, i) => (
+              <button
+                key={`tag-${i}`}
+                className="bg-gray border cursor-pointer border-gray-300 px-3 py-1 rounded-lg hover:bg-gray-200"
+                onClick={() => onSelectTag(t.name)}
+              >
+                {t.name}
+              </button>
+            ))}
       </div>
     </div>
   );

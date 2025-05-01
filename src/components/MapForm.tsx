@@ -49,8 +49,8 @@ function GeolocationHandler({
       setPosition([lat, lng]);
       onChange(lat, lng, address);
       map.setView([lat, lng], 13); // Zoom ke lokasi user
-      setHasFetchedLocation(true); // ✅ Hindari fetching ulang
-    });
+      setHasFetchedLocation(true);
+    }), { enableHighAccuracy: true }
   }, [hasFetchedLocation, map, onChange, setPosition]);
 
   return null;

@@ -1,6 +1,15 @@
 import MainController from "@/controllers/post";
 import imagekit from "@/utils/imagekit";
-
+async function streamToArray(stream: ReadableStream): Promise<Uint8Array> {
+  const reader = stream.getReader();
+  const chunks = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  return Buffer.concat(chunks);
+} 
 export async function POST(req: Request) {
   const formData = await req.formData();
 
@@ -19,22 +28,24 @@ export async function POST(req: Request) {
   let imageUrl = "";
 
   if (file) {
-    const buffer = await file.arrayBuffer();
-
+    // Convert stream to Buffer
+    const buffer = Buffer.from(await streamToArray(file.stream()));
+  
     const uploadResult = await imagekit.upload({
-      file: Buffer.from(buffer),
-      fileName: `image-${Date.now()}.jpg`,
+      file: buffer,
+      fileName: `media-${Date.now()}.${file.type.split("/")[1]}`,
       useUniqueFileName: false,
       folder: "LaporanApp",
     });
+    console.log("kampret")
 
     if (!uploadResult || !uploadResult.url) {
-      throw new Error("Image upload failed");
+      throw new Error("Upload failed");
     }
-
+  
     imageUrl = uploadResult.url;
   }
-
+  
   const post = await MainController.post({
     title,
     image: imageUrl,

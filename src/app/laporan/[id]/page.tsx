@@ -162,6 +162,7 @@ export default function DetailLaporanPage() {
       </p>
     );
   }
+  console.log(post)
 
   return (
     <main className="p-6 md:p-8 max-w-5xl mx-auto">
@@ -193,35 +194,52 @@ export default function DetailLaporanPage() {
       {post.image && post.location ? (
         <div className="grid md:grid-cols-2 gap-4 mb-4">
           <div className="w-full h-auto aspect-video">
-            <img
-              src={post.image}
-              alt="Gambar laporan"
-              className="w-full h-full object-cover rounded-lg shadow-sm"
-            />
+            {post.image.match(/\.(mp4|webm|ogg)$/i) ? (
+              <video
+                src={post.image}
+                controls
+                className="w-full h-full object-cover rounded-lg shadow-sm"
+              />
+            ) : (
+              <img
+                src={post.image}
+                alt="Gambar laporan"
+                className="w-full h-full object-cover rounded-lg shadow-sm"
+              />
+            )}
           </div>
           <div className="w-full h-64 md:h-auto rounded-lg overflow-hidden border shadow-sm">
             <MapReadOnly
-              lat={post.location.lat}
-              lng={post.location.lng}
+              lat={post.location.coordinates[1]}
+              lng={post.location.coordinates[0]}
             />
           </div>
         </div>
       ) : post.image ? (
         <div className="w-full max-w-2xl mx-auto mb-4 aspect-video">
-          <img
-            src={post.image}
-            alt="Gambar laporan"
-            className="w-full h-full object-cover rounded-lg shadow-sm"
-          />
+          {post.image.match(/\.(mp4|webm|ogg)$/i) ? (
+            <video
+              src={post.image}
+              controls
+              className="w-full h-full object-cover rounded-lg shadow-sm"
+            />
+          ) : (
+            <img
+              src={post.image}
+              alt="Gambar laporan"
+              className="w-full h-full object-cover rounded-lg shadow-sm"
+            />
+          )}
         </div>
       ) : post.location ? (
         <div className="h-64 md:h-96 mb-4 rounded-lg overflow-hidden border shadow-sm">
           <MapReadOnly
-            lat={post.location.lat}
-            lng={post.location.lng}
+            lat={post.location.coordinates[1]}
+            lng={post.location.coordinates[0]}
           />
         </div>
       ) : null}
+
 
       {post.location?.address && (
         <div className="text-sm text-gray-500 flex items-center gap-1">
