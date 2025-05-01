@@ -38,7 +38,7 @@ const TagComponent = ({
       <span className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-white via-transparent to-transparent z-10 pointer-events-none"></span>
 
       <div
-        className="mb-4 flex gap-2 pr-8 overflow-x-auto relative"
+        className="px-3 md:px-0 mb-4 flex gap-2 sm:pr-8 md:pr-8 overflow-x-auto relative"
         ref={scrollContainerRef}
         onMouseDown={handleMouseDown}
         style={{
@@ -57,7 +57,7 @@ const TagComponent = ({
           : tags.map((t: any, i) => (
               <button
                 key={`tag-${i}`}
-                className="bg-gray border cursor-pointer border-gray-300 px-3 py-1 rounded-lg hover:bg-gray-200"
+                className="bg-gray border cursor-pointer border-gray-300 px-3 py-1 rounded-lg hover:bg-gray-100"
                 onClick={() => onSelectTag(t.name)}
               >
                 {t.name}

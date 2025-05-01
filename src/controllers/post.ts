@@ -1,7 +1,7 @@
 // controllers/MainController.ts
 import { mainModel, tagModel, pusatModel, commentModel } from "@/models/post";
 import dbConnect from "@/utils/mongoose";
-import mongoose, { Model } from "mongoose";
+import mongoose, { Model, Types } from "mongoose";
 
 await dbConnect();
 class MainController {
@@ -22,7 +22,7 @@ class MainController {
       title: data.title,
       image: data.image,
       tags,
-      completed: false,
+      completed: [],
       location: data.location, // Sudah GeoJSON
       expiredAt: new Date(Date.now() + 60 * 1000), // 1 menit dari sekarang (debugging)
     });
@@ -125,22 +125,25 @@ class MainController {
     }
   }
 
-  static async completeIt(id: string) {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Error("ID tidak valid");
-    }
-
-    const updated = await mainModel.findByIdAndUpdate(
-      id,
-      { completed: true },
-      { new: true }
+  static async completeIt(itemId: Types.ObjectId, userId: Types.ObjectId) {
+    const item = await mainModel.findById(itemId);
+    if (!item) throw new Error("Item not found");
+    
+    const userIndex = item.completed?.findIndex(
+      (u: any) => u.toString() === userId
     );
-
-    if (!updated) {
-      throw new Error("Post tidak ditemukan");
+  
+    if (userIndex === -1) {
+      //@ts-ignore
+      item.completed?.push(userId);
+    } else {
+      //@ts-ignore
+      item.completed?.splice(userIndex, 1);
     }
-
-    return updated;
+  
+    await item.save();
+    
+    return item;
   }
 
   static async completePusat(id: string) {
@@ -174,12 +177,17 @@ class MainController {
   }
 
   static async getUncompleted() {
-    return await mainModel.find({ completed: false }).sort({ _id: -1 }).exec();
-  }
+    return await mainModel
+    .find({ "completed.3": { $exists: false } }) // artinya index ke-3 (user ke-4) ada → total > 3
+    .sort({ _id: -1 })
+    .exec();  }
 
   static async getCompleted() {
-    return await mainModel.find({ completed: true }).sort({ _id: -1 }).exec();
-  }
+    return await mainModel
+    .find({ "completed.3": { $exists: true } }) // artinya index ke-3 (user ke-4) ada → total > 3
+    .sort({ _id: -1 })
+    .exec();
+    }
 
   static async getById(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) {

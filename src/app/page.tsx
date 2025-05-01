@@ -22,11 +22,12 @@ type Post = {
   title: string;
   image?: string;
   tags: string[];
-  completed: boolean;
+  completed: [];
   location?: any;
 };
 
 type userType = {
+  _id: any;
   name: string;
   email: string;
   atmin: boolean;
@@ -43,6 +44,8 @@ export default function LaporanPage() {
   const router = useRouter();
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [userKabupaten, setUserKabupaten] = useState<string | null>(null);
+
+  const [tokenn, setTokenn] = useState("");
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -200,7 +203,12 @@ export default function LaporanPage() {
   }
 
   async function markAsCompleted(id: string) {
-    await fetch(`/api/post/${id}`, { method: "PATCH" });
+    const tokenTemp = await refreshAccessToken();
+    if (!tokenTemp) return;
+
+    await fetch(`/api/post/${id}`, {
+      method: "PATCH", headers: { Authorization: `Bearer ${tokenTemp}` },
+    });
     await fetchPosts();
   }
 
@@ -236,23 +244,23 @@ export default function LaporanPage() {
         </div>
       </div>
 
-      <div className="p-3 max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-800 text-center">Laporin</h1>
+      <div className="md:p-3 md:max-w-5xl mx-auto">
+        <h1 className=" text-4xl font-bold text-gray-800 text-center">Laporin</h1>
 
         {userKabupaten ? (
-          <div className="flex justify-center items-center text-sm text-gray-600 mt-5 gap-1">
+          <div className="sm:px-3 px-0 flex justify-center items-center text-sm text-gray-600 mt-5 gap-1">
             <MapPin className="w-4 h-4" />
             <span>Lokasi kamu:</span>
             <strong>{userKabupaten}</strong>
           </div>
         ) : (
-          <div className="flex justify-center items-center text-sm text-gray-600 mt-6 gap-1">
+          <div className="sm:px-3 px-0 flex justify-center items-center text-sm text-gray-600 mt-6 gap-1">
             <MapPin className="w-4 h-4" />
             <div className="h-4 w-20 bg-gray-100 rounded" />
             <div className="h-4 w-32 bg-gray-200 rounded" />
           </div>
         )}
-        <div className="mt-5 mb-3 flex gap-2">
+        <div className="px-3 md:px-0 mt-5 mb-3 flex gap-2">
           <input
             type="text"
             placeholder="Cari tag..."
@@ -280,17 +288,17 @@ export default function LaporanPage() {
               </div>
             ))
             : posts
-              .filter((p) => !p.completed)
+              .filter((p) => p.completed.length < 3)
               .map((p) => (
                 <div
                   key={p._id}
                   className="p-5 rounded-xl bg-gray-100 border border-gray-200 shadow-md flex flex-col gap-4"
                 >
                   <div
-                    className={`text-sm font-semibold flex items-center gap-1 ${p.completed ? "text-green-600" : "text-red-600"
+                    className={`text-sm font-semibold flex items-center gap-1 ${p.completed.length > 3 ? "text-green-600" : "text-red-600"
                       }`}
                   >
-                    {p.completed ? "✅ Selesai" : "❌ Belum Selesai"}
+                    {p.completed.length > 3 ? "✅ Selesai" : "❌ Belum Selesai"}
                   </div>
 
                   <p className="text-sm font-bold text-gray-800 whitespace-pre-line">
@@ -343,14 +351,22 @@ export default function LaporanPage() {
                       <Eye className="w-4 h-4" /> Lihat Detail
                     </a>
 
-                    {user?.atmin && !p.completed && (
-                      <button
-                        onClick={() => markAsCompleted(p._id)}
-                        className="bg-green-500 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
-                      >
-                        <CheckCircle2 className="w-4 h-4" /> Tandai Selesai
-                      </button>
-                    )}
+                    {//@ts-ignore
+                      p.completed.length < 3 && !p.completed.includes(user._id) ? (
+                        <button
+                          onClick={() => markAsCompleted(p._id)}
+                          className="bg-green-500 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
+                        >
+                          <CheckCircle2 className="w-4 h-4" /> Tandai Selesai
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => markAsCompleted(p._id)}
+                          className="bg-red-500 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
+                        >
+                          <CheckCircle2 className="w-4 h-4" /> Tandai Belum Selesai
+                        </button>
+                      )}
                   </div>
                 </div>
               ))}

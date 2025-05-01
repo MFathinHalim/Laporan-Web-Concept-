@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { Model, Schema, model, models } from "mongoose";
 
 // Tambahkan interface Data di sini atau import dari file lain
@@ -6,7 +7,7 @@ interface Data {
   title: string;
   image?: string;
   tags: string[];
-  completed?: boolean;
+  completed?: [];
   location?: {
     type: "Point";
     coordinates: [number, number]; // [lng, lat]
@@ -22,14 +23,13 @@ interface CommentData {
   createdAt?: Date;
 }
 
-
 // Main post schema
 const mainSchema = new Schema<Data>(
   {
     title: { type: String, required: true },
     image: { type: String },
     tags: [String],
-    completed: { type: Boolean, default: false },
+    completed: [{ type: Types.ObjectId, ref: "User", default: [] }], 
     location: {
       type: {
         type: String,
@@ -67,8 +67,11 @@ const tagSchema = new Schema({
 
 // Export model
 const mainModel: Model<Data> = models.mains || model<Data>("mains", mainSchema);
-const pusatModel: Model<Data> = models.pusats || model<Data>("pusats", mainSchema);
-const tagModel: Model<{ name: string }> = models.tags || model("tags", tagSchema);
-const commentModel: Model<CommentData> = models.Comment || model<CommentData>("Comment", commentSchema);
+const pusatModel: Model<Data> =
+  models.pusats || model<Data>("pusats", mainSchema);
+const tagModel: Model<{ name: string }> =
+  models.tags || model("tags", tagSchema);
+const commentModel: Model<CommentData> =
+  models.Comment || model<CommentData>("Comment", commentSchema);
 
 export { pusatModel, mainModel, tagModel, commentModel };
