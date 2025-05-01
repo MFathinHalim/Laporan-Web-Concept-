@@ -1,7 +1,7 @@
 // controllers/MainController.ts
-import { mainModel, tagModel, pusatModel } from "@/models/post";
+import { mainModel, tagModel, pusatModel, commentModel } from "@/models/post";
 import dbConnect from "@/utils/mongoose";
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 
 await dbConnect();
 class MainController {
@@ -38,10 +38,66 @@ class MainController {
     return newPost;
   }
 
-  static async get(page: number = 1, limit: number = 10) {
+  static async getTag(page: number = 1, limit: number = 100) {
+    const getTags = this.get(page, limit, tagModel)
+    return getTags;
+  }
+
+  static async createComment(postId: string, data: { user: userType; content: string }) {
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+      throw new Error("Invalid Post ID");
+    }
+
+    const post = await mainModel.findById(postId);
+    if (!post) {
+      throw new Error("Post not found");
+    }
+
+    // Create the comment
+    const newComment = new commentModel({
+      postId,
+      user: data.user.username,
+      content: data.content,
+    });
+
+    await newComment.save();
+    return newComment;
+  }
+
+  // Get comments for a specific post (with pagination)
+  static async getCommentsByPostId(postId: string, page: number = 1, limit: number = 10) {
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+      throw new Error("Invalid Post ID");
+    }
+
+    const skip = (page - 1) * limit;
+    const comments = await commentModel
+      .find({ postId })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 }); // Sort comments by creation date (latest first)
+    
+    return comments;
+  }
+
+  // Get all comments for a post without pagination (useful for backend/admin panels)
+  static async getAllCommentsForPost(postId: string) {
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+      throw new Error("Invalid Post ID");
+    }
+
+    const comments = await commentModel
+      .find({ postId })
+      .sort({ createdAt: -1 }); // Sort comments by creation date (latest first)
+
+    return comments;
+  }
+
+
+  static async get(page: number = 1, limit: number = 10, model:any = mainModel) {
     const skip = (page - 1) * limit;
 
-    const posts = await mainModel.find()
+    const posts = await model.find()
       .sort({ _id: -1 })
       .skip(skip)
       .limit(limit)
@@ -51,14 +107,7 @@ class MainController {
   }
 
   static async getPusat(page: number = 1, limit: number = 10) {
-    const skip = (page - 1) * limit;
-
-    const posts = await pusatModel.find()
-      .sort({ _id: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec();
-
+    const posts = this.get(page, limit, pusatModel)
     return posts;
   }
 

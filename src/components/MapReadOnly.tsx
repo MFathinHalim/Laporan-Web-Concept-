@@ -1,43 +1,22 @@
 "use client";
-
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-
-// Paksa icon marker default biar muncul
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-});
-
-type Props = {
+type MapFormProps = {
   lat: number;
   lng: number;
-  address?: string;
 };
 
-export default function MapReadOnly({ lat, lng, address }: Props) {
-    return lat && lng && address ? (
-        <MapContainer
-      center={[lat, lng]}
-      zoom={13}
-      scrollWheelZoom={false}
-      style={{ height: "100%", width: "100%" }}
-      dragging={false}
-      doubleClickZoom={false}
-      zoomControl={false}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution="&copy; OpenStreetMap contributors"
-      />
-      <Marker position={[lat, lng]}>
-        <Popup>{address || "Lokasi"}</Popup>
-      </Marker>
-    </MapContainer>
-      ) : (
-        <div className="text-center py-4 text-gray-500">⏳ Memuat peta...</div>
-      );
+export default function MapReadOnly({ lat, lng }: MapFormProps) {
+  const embedUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+
+  return (
+    <div className="w-full h-full rounded overflow-hidden">
+      <iframe
+        src={embedUrl}
+        width="100%"
+        height="100%"
+        style={{ border: 0 }}
+        loading="lazy"
+        allowFullScreen
+      ></iframe>
+    </div>
+  );
 }

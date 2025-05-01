@@ -15,6 +15,13 @@ interface Data {
   createdAt?: Date;
   updatedAt?: Date;
 }
+interface CommentData {
+  user: string; // The user who commented
+  content: string; // The comment content
+  postId: string; // Reference to the Post
+  createdAt?: Date;
+}
+
 
 // Main post schema
 const mainSchema = new Schema<Data>(
@@ -40,6 +47,15 @@ const mainSchema = new Schema<Data>(
   },
   { timestamps: true }
 );
+const commentSchema = new Schema<CommentData>(
+  {
+    user: { type: String, required: true },
+    content: { type: String, required: true },
+    //@ts-ignore
+    postId: { type: Schema.Types.ObjectId, ref: "Post", required: true }, // Reference to the Post
+  },
+  { timestamps: true }
+);
 
 // Tambahkan index untuk geospasial query
 mainSchema.index({ location: "2dsphere" });
@@ -53,5 +69,6 @@ const tagSchema = new Schema({
 const mainModel: Model<Data> = models.mains || model<Data>("mains", mainSchema);
 const pusatModel: Model<Data> = models.pusats || model<Data>("pusats", mainSchema);
 const tagModel: Model<{ name: string }> = models.tags || model("tags", tagSchema);
+const commentModel: Model<CommentData> = models.Comment || model<CommentData>("Comment", commentSchema);
 
-export { pusatModel, mainModel, tagModel };
+export { pusatModel, mainModel, tagModel, commentModel };

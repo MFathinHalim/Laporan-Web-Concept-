@@ -10,8 +10,10 @@ import {
   FilePlus,
   Eye,
   CheckCircle2,
-  MapPin
+  MapPin,
+  Plus
 } from "lucide-react";
+import TagComponent from "@/components/TagComponent";
 
 const MapReadOnly = dynamic(() => import("../components/MapReadOnly"), { ssr: false });
 
@@ -32,6 +34,7 @@ type userType = {
 
 export default function LaporanPage() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [tags, setTags] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -157,6 +160,16 @@ export default function LaporanPage() {
     fetchPosts(1);
   }, []);
 
+  async function getTag() {
+    const res = await fetch(`/api/post/getTag`);
+    const data = await res.json();
+    console.log(data)
+    setTags(data);
+  }
+  useEffect(() => {
+    getTag()
+  }, [])
+
   // Scroll Listener
   useEffect(() => {
     function handleScroll() {
@@ -193,135 +206,139 @@ export default function LaporanPage() {
   useEffect(() => {
     fetchPosts();
   }, []);
-
+  useEffect(() => {
+    if (tag) {
+      fetchByTag();
+    }
+  }, [tag]);
   return (
     <main>
-      <div className="bg-gray-100 sticky top-0">
-      <div className="flex items-center justify-between mb-3 py-4 px-3 md:px-8 max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-800">Laporan (Concept)</h1>
-        {user ? (
-          <div className="flex items-center gap-4">
-            <a href="/tambah" className="flex items-center gap-1 text-blue-600 hover:underline">
-              <FilePlus className="w-4 h-4" /> Lapor
-            </a>
-            <button
-              onClick={logout}
-              className="text-red-600 hover:underline text-sm flex items-center gap-1"
-            >
-              <LogOut className="w-4 h-4" /> Logout
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-4">
-          <a href="/login" className="flex items-center gap-1 text-green-600 hover:underline">
-            Login
-          </a>
-        </div>
-        )}
-      </div>
-      </div>
-
-      <div className="p-3 py-4 md:p-8 md:pt-3 max-w-5xl mx-auto">
-      {userKabupaten && (
-      <div className="flex justify-center items-center text-sm text-gray-600 mb-5 gap-1">
-        <MapPin className="w-4 h-4" />
-        <span>Lokasi kamu:</span>
-        <strong>{userKabupaten}</strong>
-      </div>      
-      )}
-      <div className="mb-4 flex gap-2">
-        <input
-          type="text"
-          placeholder="Cari tag..."
-          value={tag}
-          onChange={(e) => setTag(e.target.value)}
-          className="p-3 bg-gray-100 border border-gray-200 rounded-lg w-full text-sm focus:outline-none focus:ring focus:border-blue-300"
-        />
-        <button
-          onClick={fetchByTag}
-          className="bg-gray-100 border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 text-sm flex items-center gap-1"
-        >
-          <Search className="w-4 h-4" /> Cari
-        </button>
-      </div>
-
-      <div className="grid gap-4">
-        {posts
-          .filter((p) => !p.completed)
-          .map((p) => (
-            <div
-              key={p._id}
-              className="p-5 rounded-xl bg-gray-100 shadow-md flex flex-col gap-4"
-            >
-              <div
-                className={`text-sm font-semibold flex items-center gap-1 ${p.completed ? "text-green-600" : "text-red-600"
-                  }`}
+      <div className="top-0 z-40">
+        <div className="flex items-center justify-between pt-4 mt-3 px-4 max-w-5xl mx-auto">
+          <h1 className="text-2xl font-bold text-gray-800"></h1>
+          {user ? (
+            <div className="flex items-center gap-4">
+              <button
+                onClick={logout}
+                className="text-red-600 hover:underline text-sm flex items-center gap-1"
               >
-                {p.completed ? "✅ Selesai" : "❌ Belum Selesai"}
-              </div>
+                <LogOut className="w-4 h-4" /> Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <a href="/login" className="flex items-center gap-1 text-green-600 hover:underline">
+                Login
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="p-3 max-w-5xl mx-auto">
+      <h1 className="text-4xl font-bold text-gray-800 text-center">Laporin</h1>
+
+        {userKabupaten && (
+          <div className="flex justify-center items-center text-sm text-gray-600 mt-5 gap-1">
+            <MapPin className="w-4 h-4" />
+            <span>Lokasi kamu:</span>
+            <strong>{userKabupaten}</strong>
+          </div>
+        )}
+        <div className="mt-5 mb-3 flex gap-2">
+          <input
+            type="text"
+            placeholder="Cari tag..."
+            value={tag}
+            onChange={(e) => setTag(e.target.value)}
+            className="p-3 bg-gray-100 border border-gray-200 rounded-lg w-full text-sm focus:outline-none focus:ring focus:border-blue-300"
+          />
+        </div>
+        <TagComponent tags={tags} />
+        <div className="grid gap-4 mt-8">
+          {posts
+            .filter((p) => !p.completed)
+            .map((p) => (
+              <div
+                key={p._id}
+                className="p-5 rounded-xl bg-gray-100 border border-gray-200 shadow-md flex flex-col gap-4"
+              >
+                <div
+                  className={`text-sm font-semibold flex items-center gap-1 ${p.completed ? "text-green-600" : "text-red-600"
+                    }`}
+                >
+                  {p.completed ? "✅ Selesai" : "❌ Belum Selesai"}
+                </div>
 
 
-              <p className="text-sm font-bold text-gray-800 whitespace-pre-line">
-                {p.title}
-              </p>
+                <p className="text-sm font-bold text-gray-800 whitespace-pre-line">
+                  {p.title}
+                </p>
 
-              <div className="flex flex-col md:flex-row gap-4">
-                {p.image && (
-                  <img
-                    src={p.image}
-                    alt=""
-                    className="rounded w-full md:w-1/2 h-auto object-cover max-h-60"
-                  />
-                )}
-
-                {p.location && (
-                  <div className="flex-1 min-h-[200px] w-full md:w-1/2 rounded overflow-hidden">
-                    <MapReadOnly
-                      lat={p.location.coordinates[1]}
-                      lng={p.location.coordinates[0]}
-                      address={p.location.address}
+                <div className="flex flex-col md:flex-row gap-4">
+                  {p.image && (
+                    <img
+                      src={p.image}
+                      alt=""
+                      className="rounded w-full md:w-1/2 h-auto object-cover max-h-60"
                     />
+                  )}
+
+                  {p.location && (
+                    <div className="flex-1 min-h-[200px] w-full md:w-1/2 rounded overflow-hidden">
+                      <MapReadOnly
+                        lat={p.location.lat}
+                        lng={p.location.lng}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {p.location?.address && (
+                  <div className="text-sm text-gray-500 flex items-center gap-1">
+                    <MapPin className="w-4 h-4" /> {p.location.address}
                   </div>
                 )}
-              </div>
 
-              {p.location?.address && (
-                <div className="text-sm text-gray-500 flex items-center gap-1">
-                  <MapPin className="w-4 h-4" /> {p.location.address}
+                <div className="text-sm text-gray-500">
+                  Tags: {p.tags.map((t) => `#${t}`).join(" ")}
                 </div>
-              )}
 
-              <div className="text-sm text-gray-500">
-                Tags: {p.tags.map((t) => `#${t}`).join(" ")}
-              </div>
-
-              <div className="flex flex-wrap gap-3 text-sm">
-                <a
-                  href={`/laporan/${p._id}`}
-                  className="bg-black rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
-                >
-                  <Eye className="w-4 h-4" /> Lihat Detail
-                </a>
-
-                {user?.atmin && !p.completed && (
-                  <button
-                    onClick={() => markAsCompleted(p._id)}
-                    className="bg-green-500 rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
+                <div className="flex flex-wrap gap-3 text-sm">
+                  <a
+                    href={`/laporan/${p._id}`}
+                    className="bg-black rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
                   >
-                    <CheckCircle2 className="w-4 h-4" /> Tandai Selesai
-                  </button>
-                )}
+                    <Eye className="w-4 h-4" /> Lihat Detail
+                  </a>
+
+                  {user?.atmin && !p.completed && (
+                    <button
+                      onClick={() => markAsCompleted(p._id)}
+                      className="bg-green-500 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
+                    >
+                      <CheckCircle2 className="w-4 h-4" /> Tandai Selesai
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+        </div>
+        {loading && (
+          <p className="text-center text-gray-500 mt-4">⏳ Memuat data...</p>
+        )}
+        {!hasMore && (
+          <p className="text-center text-gray-400 mt-4">✅ Semua laporan telah ditampilkan</p>
+        )}
       </div>
-      {loading && (
-        <p className="text-center text-gray-500 mt-4">⏳ Memuat data...</p>
+      {user && (
+        <a
+          href="/tambah"
+          className="fixed bottom-4 right-4 bg-gray-200 border border-gray-300 hover:bg-gray-300 font-bold p-4 rounded-full shadow-lg"
+        >
+          <Plus />
+        </a>
       )}
-      {!hasMore && (
-        <p className="text-center text-gray-400 mt-4">✅ Semua laporan telah ditampilkan</p>
-      )}
-      </div>
     </main>
   );
 }
