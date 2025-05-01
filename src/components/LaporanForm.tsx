@@ -38,8 +38,8 @@ export default function LaporanForm({ onSuccess }: Props) {
         body.append("lng", formData.lng);
         body.append("address", formData.address);
 
-        await fetch("/api/post", { method: "POST", body });
         setIsFormValid(false)
+        await fetch("/api/post", { method: "POST", body });
         setFormData({ title: "", image: null, lat: "", lng: "", address: "" });
         onSuccess();
     }

@@ -37,7 +37,6 @@ export async function POST(req: Request) {
       useUniqueFileName: false,
       folder: "LaporanApp",
     });
-    console.log("kampret")
 
     if (!uploadResult || !uploadResult.url) {
       throw new Error("Upload failed");
