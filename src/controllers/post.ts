@@ -130,9 +130,9 @@ class MainController {
     if (!item) throw new Error("Item not found");
     
     const userIndex = item.completed?.findIndex(
-      (u: any) => u.toString() === userId
+      (u: any) => String(u) === String(userId._id)
     );
-  
+    console.log(item.completed)
     if (userIndex === -1) {
       //@ts-ignore
       item.completed?.push(userId);

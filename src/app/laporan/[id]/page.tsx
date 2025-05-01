@@ -22,7 +22,7 @@ type Post = {
   title: string;
   image?: string;
   tags: string[];
-  completed: boolean;
+  completed: [];
   location?: any;
   user?: string; // Tambahkan user pada post
 };
@@ -33,6 +33,33 @@ type Comment = {
   content: string;
   createdAt: string;
 };
+
+function SkeletonPage() {
+  return (
+    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-4">
+      <div className="h-6 bg-gray-300 rounded w-40 animate-pulse" /> {/* Kembali */}
+      <div className="h-8 bg-gray-300 rounded w-1/2 animate-pulse" /> {/* Title */}
+      <div className="h-4 bg-gray-200 rounded w-32 animate-pulse" /> {/* Status */}
+
+      <div className="w-full h-64 bg-gray-200 rounded animate-pulse" /> {/* Gambar/Peta */}
+
+      <div className="h-6 bg-gray-300 rounded w-32 animate-pulse" /> {/* Alamat */}
+
+      <div className="h-8 bg-gray-300 rounded w-40 animate-pulse mt-6" /> {/* Komentar Title */}
+      <div className="space-y-2">
+        {[1, 2, 3].map((_, i) => (
+          <div key={i} className="p-3 rounded animate-pulse space-y-2">
+            <div className="h-4 bg-gray-300 rounded w-1/4" /> {/* User */}
+            <div className="h-3 bg-gray-200 rounded w-3/4" /> {/* Timestamp */}
+            <div className="h-4 bg-gray-200 rounded w-full" /> {/* Comment line */}
+            <div className="h-4 bg-gray-200 rounded w-2/3" /> {/* Comment line shorter */}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 
 export default function DetailLaporanPage() {
   const { id } = useParams();
@@ -156,11 +183,7 @@ export default function DetailLaporanPage() {
   };
 
   if (!post) {
-    return (
-      <p className="text-center py-10 text-gray-500">
-        ⏳ Memuat detail laporan...
-      </p>
-    );
+    return <SkeletonPage />;
   }
   console.log(post)
 
@@ -168,18 +191,18 @@ export default function DetailLaporanPage() {
     <main className="p-6 md:p-8 max-w-5xl mx-auto">
       <button
         onClick={() => router.push("/")}
-        className="text-sm text-blue-600 hover:underline mb-4 flex items-center gap-1"
+        className="text-sm text-blue-600 hover:underline cursor-pointer mb-4 flex items-center gap-1"
       >
         <ArrowLeft className="w-4 h-4" /> Kembali ke Beranda
       </button>
 
       <h1 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-        <FileText className="w-6 h-6 text-blue-500" /> {post.title}
+        {post.title}
       </h1>
 
       <div className="text-sm text-gray-600 mb-3 flex items-center gap-2">
         Status:
-        {post.completed ? (
+        {post.completed.length >= 3 ? (
           <span className="text-green-600 font-semibold flex items-center gap-1">
             <CheckCircle2 className="w-4 h-4" /> Selesai
           </span>
@@ -294,7 +317,20 @@ export default function DetailLaporanPage() {
               <p className="text-gray-700 mt-2">{comment.content}</p>
             </div>
           ))}
-          {loading && <p className="text-center text-gray-500">Memuat komentar...</p>}
+          {loading && (
+            <div className="space-y-2">
+              {[1, 2, 3].map((_, i) => (
+                <div key={i} className="p-3 rounded animate-pulse">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-20 h-4 bg-gray-300 rounded"></div>
+                    <div className="w-32 h-3 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="w-full h-4 bg-gray-200 rounded mb-1"></div>
+                  <div className="w-2/3 h-4 bg-gray-200 rounded"></div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </main>

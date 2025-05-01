@@ -11,7 +11,8 @@ import {
   Eye,
   CheckCircle2,
   MapPin,
-  Plus
+  Plus,
+  XCircle
 } from "lucide-react";
 import TagComponent from "@/components/TagComponent";
 
@@ -44,8 +45,8 @@ export default function LaporanPage() {
   const router = useRouter();
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [userKabupaten, setUserKabupaten] = useState<string | null>(null);
+  const [showCompletedOnly, setShowCompletedOnly] = useState(false);
 
-  const [tokenn, setTokenn] = useState("");
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -144,7 +145,8 @@ export default function LaporanPage() {
 
   async function fetchPosts(pageNumber = 1, append = false) {
     setLoading(true);
-    const res = await fetch(`/api/post?page=${pageNumber}&limit=5`);
+    const endpoint = showCompletedOnly ? "/api/post/completed" : "/api/post";
+    const res = await fetch(`${endpoint}?page=${pageNumber}&limit=5`);
     const data = await res.json();
 
     if (data.length === 0) {
@@ -206,10 +208,27 @@ export default function LaporanPage() {
     const tokenTemp = await refreshAccessToken();
     if (!tokenTemp) return;
 
-    await fetch(`/api/post/${id}`, {
+    const res = await fetch(`/api/post/${id}`, {
       method: "PATCH", headers: { Authorization: `Bearer ${tokenTemp}` },
     });
     await fetchPosts();
+
+    if (res.ok) {
+      //@ts-expect-error
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === id
+            ? {
+              ...post,
+              //@ts-ignore
+              completed: post.completed.includes(user!._id)
+                ? post.completed.filter((uid) => uid !== user!._id) // toggle: remove user
+                : [...post.completed, user!._id], // toggle: add user
+            }
+            : post
+        )
+      );
+    }
   }
 
   useEffect(() => {
@@ -270,7 +289,21 @@ export default function LaporanPage() {
           />
         </div>
         <TagComponent tags={tags} onSelectTag={(name) => setTag(name)} />
-        <div className="grid gap-4 mt-8">
+        <div className="flex mt-6">
+          <button
+            onClick={() => {
+              setShowCompletedOnly((prev) => !prev);
+              setPage(1);
+              fetchPosts(1);
+            }}
+            className="mx-2 md:mx-0 text-sm px-3 py-1.5 bg-gray-100 cursor-pointer border border-gray-300 hover:bg-gray-200 text-gray-800 rounded-full transition"
+          >
+            {showCompletedOnly ? "Tampilkan yang Belum Selesai" : "Tampilkan yang Sudah Selesai"}
+          </button>
+        </div>
+
+
+        <div className="grid gap-4 mt-2">
           {posts.length === 0
             ? Array.from({ length: 3 }).map((_, i) => (
               <div
@@ -288,7 +321,7 @@ export default function LaporanPage() {
               </div>
             ))
             : posts
-              .filter((p) => p.completed.length < 3)
+              .filter((p) => (showCompletedOnly ? p.completed.length >= 3 : true))
               .map((p) => (
                 <div
                   key={p._id}
@@ -298,7 +331,15 @@ export default function LaporanPage() {
                     className={`text-sm font-semibold flex items-center gap-1 ${p.completed.length > 3 ? "text-green-600" : "text-red-600"
                       }`}
                   >
-                    {p.completed.length > 3 ? "✅ Selesai" : "❌ Belum Selesai"}
+                    {p.completed.length > 3 ? (
+                      <span className="flex items-center font-semibold gap-1 text-green-600">
+                        <CheckCircle2 className="w-4 h-4" /> Selesai
+                      </span>
+                    ) : (
+                      <span className="flex items-center font-semibold gap-1 text-red-600">
+                        <XCircle className="w-4 h-4" /> Belum Selesai
+                      </span>
+                    )}
                   </div>
 
                   <p className="text-sm font-bold text-gray-800 whitespace-pre-line">
@@ -352,21 +393,23 @@ export default function LaporanPage() {
                     </a>
 
                     {//@ts-ignore
-                      p.completed.length < 3 && !p.completed.includes(user._id) ? (
+                      p.completed.length < 3 && user && !p.completed.includes(user._id) ? (
                         <button
                           onClick={() => markAsCompleted(p._id)}
                           className="bg-green-500 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
                         >
-                          <CheckCircle2 className="w-4 h-4" /> Tandai Selesai
+                          <CheckCircle2 className="w-4 h-4" /> Selesai
                         </button>
-                      ) : (
+                      ) : user ? (
                         <button
                           onClick={() => markAsCompleted(p._id)}
-                          className="bg-red-500 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
+                          className="bg-red-500 hover:bg-red-600 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
                         >
-                          <CheckCircle2 className="w-4 h-4" /> Tandai Belum Selesai
+                          <XCircle className="w-4 h-4" /> Belum
                         </button>
-                      )}
+                      ) : null
+                    }
+
                   </div>
                 </div>
               ))}

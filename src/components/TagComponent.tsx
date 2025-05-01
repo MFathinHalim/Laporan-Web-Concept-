@@ -35,7 +35,7 @@ const TagComponent = ({
 
   return (
     <div style={{ position: "relative", height: "fit-content" }}>
-      <span className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-white via-transparent to-transparent z-10 pointer-events-none"></span>
+      <span className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-white via-transparent to-transparent z-10"></span>
 
       <div
         className="px-3 md:px-0 mb-4 flex gap-2 sm:pr-8 md:pr-8 overflow-x-auto relative"
