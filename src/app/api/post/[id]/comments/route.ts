@@ -4,8 +4,7 @@ import MainController from "@/controllers/post";
 
 // GET all comments for a specific post
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  req: NextRequest
 ) {
     const postId = req.nextUrl.pathname.split("/").slice(-2, -1)[0];
 
