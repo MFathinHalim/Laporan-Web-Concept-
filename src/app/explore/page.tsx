@@ -197,16 +197,17 @@ export default function LaporanPage() {
 
               {/* Overlay */}
               <div className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end items-center p-6 text-center pointer-events-none">
-                <div className="pointer-events-auto">
-                  <h2 className="text-xl font-bold mb-3">{post.title}</h2>
+                <div className="pointer-events-auto w-sm">
+                    <div className="flex gap-2">
+                  <h2 className="text-xs text-left mb-3"> {(post.title?.match(/[^.!?]+[.!?]+/g) || [post.title]).slice(0, 4).join(" ")}...</h2>
                   <a
                     href={`/laporan/${post._id}`}
-                    className="bg-white text-black px-4 py-2 rounded text-sm hover:bg-gray-200 inline-flex items-center"
+                    className="px-3 font-bold rounded text-sm inline-flex"
                   >
-                    <Eye className="w-4 h-4 mr-1" />
-                    Lihat Detail
+                    Detail
                   </a>
-                  <p className="text-xs text-gray-300 mt-2">
+                  </div>
+                  <p className="text-xs text-left text-gray-300 mt-2">
                     Tags: {post.tags.map((t: string) => `#${t}`).join(" ")}
                   </p>
                 </div>

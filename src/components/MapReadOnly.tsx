@@ -8,7 +8,7 @@ export default function MapReadOnly({ lat, lng }: MapFormProps) {
   const embedUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
 
   return (
-    <div className="w-full h-full rounded overflow-hidden">
+    <div className="w-full h-full md:rounded overflow-hidden">
       <iframe
         src={embedUrl}
         width="100%"

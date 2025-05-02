@@ -331,10 +331,10 @@ export default function LaporanPage() {
               .map((p) => (
                 <div
                   key={p._id}
-                  className="p-5 rounded-xl bg-gray-100 border border-gray-200 shadow-md flex flex-col gap-4"
+                  className="py-5 rounded-xl bg-gray-100 border border-gray-200 shadow-md flex flex-col gap-4"
                 >
                   <div
-                    className={`text-sm font-semibold flex items-center gap-1 ${p.completed.length > 3 ? "text-green-600" : "text-red-600"
+                    className={`px-5 text-sm font-semibold flex items-center gap-1 ${p.completed.length > 3 ? "text-green-600" : "text-red-600"
                       }`}
                   >
                     {p.completed.length > 3 ? (
@@ -348,30 +348,30 @@ export default function LaporanPage() {
                     )}
                   </div>
 
-                  <p className="text-sm font-bold text-gray-800 whitespace-pre-line">
+                  <p className="px-5 text-sm font-bold text-gray-800 whitespace-pre-line">
                     {p.title}
                   </p>
 
-                  <div className="flex flex-col md:flex-row gap-4">
+                  <div className="md:px-5 flex flex-col md:flex-row md:gap-4">
                     {p.image && (
                       p.image.match(/\.(mp4|webm|ogg)$/i) ? (
                         <video
                           src={p.image}
                           controls
-                          className="rounded w-full md:w-1/2 h-auto object-cover max-h-60"
+                          className="md:rounded w-full md:w-1/2 h-auto object-cover max-h-60"
                         />
                       ) : (
                         <img
                           src={p.image}
                           alt=""
-                          className="rounded w-full md:w-1/2 h-auto object-cover max-h-60"
+                          className="md:rounded w-full md:w-1/2 h-auto object-cover max-h-60"
                         />
                       )
                     )}
 
 
                     {p.location && (
-                      <div className="flex-1 min-h-[200px] w-full md:w-1/2 rounded overflow-hidden">
+                      <div className="md: flex-1 min-h-[200px] w-full md:w-1/2 rounded overflow-hidden">
                         <MapReadOnly
                           lat={p.location.coordinates[1]}
                           lng={p.location.coordinates[0]}
@@ -381,16 +381,16 @@ export default function LaporanPage() {
                   </div>
 
                   {p.location?.address && (
-                    <div className="text-sm text-gray-500 flex items-center gap-1">
+                    <div className="px-5 text-sm text-gray-500 flex items-center gap-1">
                       <MapPin className="w-4 h-4" /> {p.location.address}
                     </div>
                   )}
 
-                  <div className="text-sm text-gray-500">
+                  <div className="px-5 text-sm text-gray-500">
                     Tags: {p.tags.map((t) => `#${t}`).join(" ")}
                   </div>
 
-                  <div className="flex flex-wrap gap-3 text-sm">
+                  <div className="px-5 flex flex-wrap gap-3 text-sm">
                     <a
                       href={`/laporan/${p._id}`}
                       className="bg-black rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
