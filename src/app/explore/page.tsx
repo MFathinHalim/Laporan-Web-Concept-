@@ -196,10 +196,10 @@ export default function LaporanPage() {
               ) : null}
 
               {/* Overlay */}
-              <div className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end items-center p-6 text-center pointer-events-none">
-                <div className="pointer-events-auto w-sm">
+              <div className="absolute bottom-0 left-0 w-screen h-full bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end items-center p-6 text-center pointer-events-none">
+                <div className="px-3 md:px-0 pointer-events-auto w-sm max-w-screen">
                     <div className="flex gap-2">
-                  <h2 className="text-xs text-left mb-3"> {(post.title?.match(/[^.!?]+[.!?]+/g) || [post.title]).slice(0, 4).join(" ")}...</h2>
+                  <h2 className="text-xs text-left mb-3"> {(post.title?.match(/[^.!?]+[.!?]+/g) || [post.title]).slice(0, 3).join(" ")}...</h2>
                   <a
                     href={`/laporan/${post._id}`}
                     className="px-3 font-bold rounded text-sm inline-flex"
@@ -207,7 +207,7 @@ export default function LaporanPage() {
                     Detail
                   </a>
                   </div>
-                  <p className="text-xs text-left text-gray-300 mt-2">
+                  <p className="text-xs text-left text-gray-300 ">
                     Tags: {post.tags.map((t: string) => `#${t}`).join(" ")}
                   </p>
                 </div>
@@ -220,14 +220,6 @@ export default function LaporanPage() {
         <div className="w-full h-screen flex justify-center items-center">
           <p className="text-gray-500">⏳ Memuat data...</p>
         </div>
-      )}
-      {user && (
-        <a
-          href="/tambah"
-          className="fixed bottom-4 right-4 bg-gray-200 border border-gray-300 hover:bg-gray-300 font-bold p-4 rounded-full shadow-lg"
-        >
-          <Plus />
-        </a>
       )}
       <a
         href="/"
