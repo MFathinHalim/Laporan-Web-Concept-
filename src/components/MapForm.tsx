@@ -79,7 +79,7 @@ export default function MapForm({ lat, lng, onChange }: MapFormProps) {
   };
 
   return position ? (
-    <MapContainer center={position} zoom={5} className="w-full h-full rounded">
+    <MapContainer center={position} zoom={5} className="w-full h-full">
       <TileLayer
         attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

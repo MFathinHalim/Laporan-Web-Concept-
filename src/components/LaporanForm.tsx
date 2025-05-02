@@ -47,17 +47,20 @@ export default function LaporanForm({ onSuccess }: Props) {
     return (
         <form
             onSubmit={handleSubmit}
-            className="space-y-4 border p-6 rounded-xl bg-white shadow-md"
+            style={{
+                borderBottom: "none !important"
+            }}
+            className="space-y-4 py-6 bg-white border-t border-x"
         >
-            <textarea
-                placeholder="Isi laporan (pakai #tag)"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                required
-                className="w-full p-3 border rounded-lg text-sm focus:outline-none focus:ring focus:border-blue-300"
-            />
 
-            <div>
+            <div className="px-6">
+                <textarea
+                    placeholder="Isi laporan (pakai #tag)"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    required
+                    className="mb-3 w-full p-3 border rounded-lg text-sm focus:outline-none focus:ring focus:border-blue-300"
+                />
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                     Upload Gambar / Video (opsional)
                 </label>
@@ -84,30 +87,31 @@ export default function LaporanForm({ onSuccess }: Props) {
                     }
                 />
             </div>
-            <div className="text-sm text-gray-500 flex items-center gap-1">
-                  <MapPin className="w-4 h-4" /> {formData.address || "Alamat"}
-            </div>
-            <input
-                type="text"
-                placeholder="Alamat"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                required
-                className="w-full p-3 border rounded-lg text-sm focus:outline-none focus:ring focus:border-blue-300"
-            />
+            <div className="px-6">
+                <div className="text-sm text-gray-500 mb-1 flex items-center gap-1">
+                    <MapPin className="w-4 h-4" /> {formData.address || "Alamat"}
+                </div>
+                <input
+                    type="text"
+                    placeholder="Alamat"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    required
+                    className="w-full mb-3 p-3 border rounded-lg text-sm focus:outline-none focus:ring focus:border-blue-300"
+                />
 
-            <button
-                id="submit"
-                type="submit"
-                disabled={!isFormValid}
-                className={`px-6 py-2 rounded-lg shadow-sm text-white ${
-                    isFormValid
-                        ? "bg-blue-600 hover:bg-blue-700"
-                        : "bg-blue-600/20 cursor-not-allowed"
-                }`}
-            >
-                Kirim
-            </button>
+                <button
+                    id="submit"
+                    type="submit"
+                    disabled={!isFormValid}
+                    className={`px-6 py-2 rounded-lg shadow-sm text-white ${isFormValid
+                            ? "bg-blue-600 hover:bg-blue-700"
+                            : "bg-blue-600/20 cursor-not-allowed"
+                        }`}
+                >
+                    Kirim
+                </button>
+            </div>
         </form>
     );
 }

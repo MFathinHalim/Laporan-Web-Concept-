@@ -289,7 +289,13 @@ export default function LaporanPage() {
           />
         </div>
         <TagComponent tags={tags} onSelectTag={(name) => setTag(name)} />
-        <div className="flex mt-6 gap-2">
+        <div className="flex mt-6 justify-between">
+          <a
+            href="/explore"
+            className="mx-2 md:mx-0 text-sm px-3 py-1.5 bg-gray-500 text-white cursor-pointer border border-gray-300 hover:bg-gray-600 rounded-full transition"
+          >
+            Explore
+          </a>
           <button
             onClick={() => {
               setShowCompletedOnly((prev) => !prev);
@@ -300,12 +306,6 @@ export default function LaporanPage() {
           >
             {showCompletedOnly ? "Tampilkan yang Belum Selesai" : "Tampilkan yang Sudah Selesai"}
           </button>
-          <a
-            href="/explore"
-            className="mx-2 md:mx-0 text-sm px-3 py-1.5 bg-gray-500 text-white cursor-pointer border border-gray-300 hover:bg-gray-600 rounded-full transition"
-          >
-            Explore
-          </a>
         </div>
 
 
