@@ -99,7 +99,11 @@ export default function LaporanPage() {
       if (data.length === 0) {
         setReachedEnd(true);
       } else {
-        setPosts((prev) => [...prev, ...data]);
+        if(data.length === 1) {
+          setPosts((prev) => [...prev, ...data, ...data, ...data, ...data, ...data]);
+        } else {
+          setPosts((prev) => [...prev, ...data]);
+        }
         setPage(pageNumber);
       }
       setLoading(false);
@@ -196,7 +200,7 @@ export default function LaporanPage() {
               ) : null}
 
               {/* Overlay */}
-              <div className="absolute bottom-0 left-0 w-screen h-full bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end items-center p-6 text-center pointer-events-none">
+              <div className="absolute bottom-0 left-0 w-screen h-full bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end items-center p-6 py-20 text-center pointer-events-none">
                 <div className="px-3 md:px-0 pointer-events-auto w-sm max-w-screen">
                     <div className="flex gap-2">
                   <h2 className="text-xs text-left mb-3"> {(post.title?.match(/[^.!?]+[.!?]+/g) || [post.title]).slice(0, 3).join(" ")}...</h2>
