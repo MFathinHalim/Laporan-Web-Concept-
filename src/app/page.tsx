@@ -242,24 +242,26 @@ export default function LaporanPage() {
   return (
     <main>
       <div className="top-0 z-40">
-        <div className="flex items-center justify-between pt-4 mt-3 px-4 max-w-5xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-800"></h1>
-          {user ? (
-            <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between pt-4 pb-8 md:pb-0 mt-3 px-4 max-w-5xl mx-auto">
+          <div className="flex items-center gap-4">
+            <a className="font-bold hover:underline hidden md:block" href="/">Laporin</a>
+            <a className="hover:underline" href="https://kamusrejang.vercel.app">Kamus Rejang</a>
+            <a className="hover:underline" href="https://rejangpedia.vercel.app">rejangpedia</a>
+          </div>          
+          <div className="flex items-center gap-4">
+            {user ? (
               <button
                 onClick={logout}
                 className="text-red-600 hover:underline text-sm flex items-center gap-1"
               >
                 <LogOut className="w-4 h-4" /> Logout
               </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4">
+            ) : (
               <a href="/login" className="flex items-center gap-1 text-green-600 hover:underline">
                 Login
               </a>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -331,7 +333,7 @@ export default function LaporanPage() {
               .map((p) => (
                 <div
                   key={p._id}
-                  className="py-5 rounded-xl bg-gray-100 border border-gray-200 shadow-md flex flex-col gap-4"
+                  className="py-5 rounded-xl bg-gray-100 border-t border-b md:border-r md:border-l border-gray-200 shadow-md flex flex-col gap-4"
                 >
                   <div
                     className={`px-5 text-sm font-semibold flex items-center gap-1 ${p.completed.length > 3 ? "text-green-600" : "text-red-600"
@@ -352,7 +354,7 @@ export default function LaporanPage() {
                     {p.title}
                   </p>
 
-                  <div className="md:px-5 flex flex-col md:flex-row md:gap-4">
+                  <div className="md:px-5 px-0 w-full flex flex-col md:flex-row md:gap-4">
                     {p.image && (
                       p.image.match(/\.(mp4|webm|ogg)$/i) ? (
                         <video
@@ -370,8 +372,8 @@ export default function LaporanPage() {
                     )}
 
 
-                    {p.location && (
-                      <div className="md: flex-1 min-h-[200px] w-full md:w-1/2 rounded overflow-hidden">
+                    {(!p.image && p.location) && (
+                      <div className="md:flex-1 min-h-[200px] w-full md:w-1/2 overflow-hidden">
                         <MapReadOnly
                           lat={p.location.coordinates[1]}
                           lng={p.location.coordinates[0]}
@@ -428,12 +430,12 @@ export default function LaporanPage() {
           <p className="text-center text-gray-400 mt-4">✅ Semua laporan telah ditampilkan</p>
         )}
       </div>
-        <a
-          href="/tambah"
-          className="fixed bottom-4 right-4 bg-gray-200 border border-gray-300 hover:bg-gray-300 font-bold p-4 rounded-full shadow-lg"
-        >
-          <Plus />
-        </a>
+      <a
+        href="/tambah"
+        className="fixed bottom-4 right-4 bg-gray-200 border border-gray-300 hover:bg-gray-300 font-bold p-4 rounded-full shadow-lg"
+      >
+        <Plus />
+      </a>
     </main>
   );
 }
