@@ -25,6 +25,7 @@ type Post = {
   image?: string;
   tags: string[];
   completed: [];
+  userId: any;
   location?: any;
 };
 
@@ -146,7 +147,7 @@ export default function LaporanPage() {
 
   async function fetchPosts(pageNumber = 1, append = false) {
     setLoading(true);
-    const endpoint = showCompletedOnly ? "/api/post/completed" : "/api/post";
+    const endpoint = "/api/post";
     const res = await fetch(`${endpoint}?page=${pageNumber}&limit=5`);
     const data = await res.json();
 
@@ -212,21 +213,12 @@ export default function LaporanPage() {
     const res = await fetch(`/api/post/${id}`, {
       method: "PATCH", headers: { Authorization: `Bearer ${tokenTemp}` },
     });
-    await fetchPosts();
-
+      if (!res.ok) throw new Error("Failed to fetch posts");
+      const data = await res.json();
     if (res.ok) {
-      //@ts-expect-error
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
-          post._id === id
-            ? {
-              ...post,
-              //@ts-ignore
-              completed: post.completed.includes(user!._id)
-                ? post.completed.filter((uid) => uid !== user!._id) // toggle: remove user
-                : [...post.completed, user!._id], // toggle: add user
-            }
-            : post
+          post._id === data._id ? data : post
         )
       );
     }
@@ -248,7 +240,7 @@ export default function LaporanPage() {
             <a className="font-bold hover:underline hidden md:block" href="/">Laporin</a>
             <a className="hover:underline" href="https://kamusrejang.vercel.app">Kamus Rejang</a>
             <a className="hover:underline" href="https://rejangpedia.vercel.app">rejangpedia</a>
-          </div>          
+          </div>
           <div className="flex items-center gap-4">
             {user ? (
               <button
@@ -330,25 +322,26 @@ export default function LaporanPage() {
               </div>
             ))
             : posts
-              .filter((p) => (showCompletedOnly ? p.completed.length >= 3 : true))
+              //@ts-ignore
+              .filter((p) => (showCompletedOnly ? p.completed.length > 10 || p.completed.includes(p.userId) : (!p.completed.includes(p.userId))))
               .map((p) => (
-                <PostCard key={p._id} p={p} user={user} markAsCompleted={markAsCompleted}/>
+                <PostCard key={p._id} p={p} user={user} markAsCompleted={markAsCompleted} />
               ))}
         </div>
 
         {loading && (
           <div
-          className="p-5 rounded-xl bg-gray-100 border border-gray-200 shadow-md flex flex-col gap-4 animate-pulse"
-        >
-          <div className="h-4 w-32 bg-gray-300 rounded" />
-          <div className="h-6 w-1/2 bg-gray-300 rounded" />
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="w-full md:w-1/2 h-48 bg-gray-300 rounded" />
-            <div className="w-full md:w-1/2 h-48 bg-gray-300 rounded" />
+            className="p-5 rounded-xl bg-gray-100 border borhadow-md flex flex-col gap-4 animate-pulse"
+          >
+            <div className="h-4 w-32 bg-gray-300 rounded" />
+            <div className="h-6 w-1/2 bg-gray-300 rounded" />
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="w-full md:w-1/2 h-48 bg-gray-300 rounded" />
+              <div className="w-full md:w-1/2 h-48 bg-gray-300 rounded" />
+            </div>
+            <div className="h-4 w-40 bg-gray-300 rounded" />
+            <div className="h-8 w-full bg-gray-300 rounded" />
           </div>
-          <div className="h-4 w-40 bg-gray-300 rounded" />
-          <div className="h-8 w-full bg-gray-300 rounded" />
-        </div>
         )}
         {!hasMore && (
           <p className="text-center text-gray-400 my-6">✅ Semua laporan telah ditampilkan</p>

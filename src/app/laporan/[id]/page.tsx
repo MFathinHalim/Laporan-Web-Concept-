@@ -23,6 +23,7 @@ type Post = {
   image?: string;
   tags: string[];
   completed: [];
+  userId: any;
   location?: any;
   user?: string; // Tambahkan user pada post
 };
@@ -202,7 +203,8 @@ export default function DetailLaporanPage() {
 
       <div className="text-sm px-6 md:px-8 text-gray-600 mb-3 flex items-center gap-2">
         Status:
-        {post.completed.length >= 3 ? (
+        {/*@ts-ignore*/}
+        {post.completed.includes(post.userId) || post.completed.length > 10 ? (
           <span className="text-green-600 font-semibold flex items-center gap-1">
             <CheckCircle2 className="w-4 h-4" /> Selesai
           </span>

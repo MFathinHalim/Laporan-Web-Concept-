@@ -144,22 +144,21 @@ class MainController {
   }
   
 
-  static async completeIt(itemId: Types.ObjectId, userId: Types.ObjectId) {
+  static async completeIt(itemId: Types.ObjectId, userId: any) {
     const item = await mainModel.findById(itemId);
     if (!item) throw new Error("Item not found");
     
     const userIndex = item.completed?.findIndex(
       (u: any) => String(u) === String(userId._id)
     );
-    console.log(item.completed)
     if (userIndex === -1) {
       //@ts-ignore
-      item.completed?.push(userId);
+      item.completed?.push(userId._id);
     } else {
       //@ts-ignore
       item.completed?.splice(userIndex, 1);
     }
-  
+    
     await item.save();
     
     return item;
@@ -203,7 +202,7 @@ class MainController {
 
   static async getCompleted() {
     return await mainModel
-    .find({ "completed.3": { $exists: true } }) // artinya index ke-3 (user ke-4) ada → total > 3
+    .find({ "completed.9": { $exists: true } })
     .sort({ _id: -1 })
     .exec();
     }

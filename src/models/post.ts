@@ -30,7 +30,7 @@ const mainSchema = new Schema<Data>(
     title: { type: String, required: true },
     image: { type: String },
     tags: [String],
-    userId: { type: Types.ObjectId, ref: "User", default: [] }, 
+    userId: { type: Types.ObjectId, ref: "User" }, 
     completed: [{ type: Types.ObjectId, ref: "User", default: [] }], 
     location: {
       type: {

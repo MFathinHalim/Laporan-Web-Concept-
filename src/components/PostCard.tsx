@@ -54,6 +54,7 @@ function PostCard({ p, user, markAsCompleted }) {
         }
     };
 
+
     return (
         <div
             key={p._id}
@@ -84,16 +85,16 @@ function PostCard({ p, user, markAsCompleted }) {
 
             {/* Rest of your content */}
             <div
-                className={`px-5 text-sm font-semibold flex items-center gap-1 ${p.completed.length > 3 ? "text-green-600" : "text-red-600"
+                className={`px-5 text-sm font-semibold flex items-center gap-1 ${p.completed.length > 10 ? "text-green-600" : "text-red-600"
                     }`}
             >
-                {p.completed.length > 3 ? (
+                {p.completed.includes(p.userId) || p.completed.length > 10 ? (
                     <span className="flex items-center font-semibold gap-1 text-green-600">
                         <CheckCircle2 className="w-4 h-4" /> Selesai
                     </span>
                 ) : (
                     <span className="flex items-center font-semibold gap-1 text-red-600">
-                        <XCircle className="w-4 h-4" /> Belum Selesai
+                        <XCircle className="w-4 h-4" /> Belum Terkonfirmasi
                     </span>
                 )}
             </div>
@@ -146,14 +147,14 @@ function PostCard({ p, user, markAsCompleted }) {
                     <Eye className="w-4 h-4" /> Lihat Detail
                 </a>
 
-                {p.completed.length < 3 && user && !p.completed.includes(user._id) ? (
+                {user && (!p.completed.includes(user._id)) ? (
                     <button
                         onClick={() => markAsCompleted(p._id)}
                         className="bg-green-500 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
                     >
                         <CheckCircle2 className="w-4 h-4" /> Selesai
                     </button>
-                ) : user ? (
+                ) : user && p.completed.includes(user._id) ? (
                     <button
                         onClick={() => markAsCompleted(p._id)}
                         className="bg-red-500 hover:bg-red-600 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
@@ -161,6 +162,7 @@ function PostCard({ p, user, markAsCompleted }) {
                         <XCircle className="w-4 h-4" /> Belum
                     </button>
                 ) : null}
+
             </div>
         </div>
     );
