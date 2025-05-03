@@ -269,7 +269,7 @@ export default function DetailLaporanPage() {
         <ArrowLeft className="w-4 h-4" /> Kembali ke Beranda
       </button>
 
-      <div className="flex justify-between align-items-center">
+      <div className="flex justify-between align-items-center pr-3 md:pr-6">
         <h1 className="text-2xl px-6 md:px-8 font-bold text-gray-800 mb-2 flex items-center gap-2">
           {post.title}
         </h1>
@@ -282,17 +282,17 @@ export default function DetailLaporanPage() {
           </button>
 
           {showMenu && (
-            <div className="absolute right-0 mt-1 bg-white border rounded shadow z-10">
+            <div className="absolute right-2 mt-1 bg-white border rounded shadow z-10">
               <button
                 onClick={handleReport}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-yellow-600 hover:bg-yellow-500 hover:text-white w-full text-left"
+                className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm w-full text-left"
               >
                 <Flag className="w-4 h-4" /> Report
               </button>
               {user && (post.userId === user._id || user.atmin) && (
                 <button
                   onClick={handleDelete}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-500 hover:text-white w-full text-left"
+                  className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-500 hover:text-white w-full text-left"
                 >
                   <Trash2 className="w-4 h-4" /> Hapus
                 </button>
@@ -303,7 +303,6 @@ export default function DetailLaporanPage() {
       </div>
 
       <div className="text-sm px-6 md:px-8 text-gray-600 mb-3 flex items-center gap-2">
-        Status:
         {/*@ts-ignore*/}
         {post.completed.includes(post.userId) || post.completed.length > 10 ? (
           <span className="text-green-600 font-semibold flex items-center gap-1">
