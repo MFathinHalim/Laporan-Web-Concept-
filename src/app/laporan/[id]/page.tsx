@@ -10,8 +10,11 @@ import {
   MapPin,
   FileText,
   MessageCircle,
-  Send
+  Send,
+  Trash2,
+  MoreVertical
 } from "lucide-react";
+import CommentsSection from "@/components/CommentSection";
 
 const MapReadOnly = dynamic(() => import("../../../components/MapReadOnly"), {
   ssr: false,
@@ -171,6 +174,7 @@ export default function DetailLaporanPage() {
 
     if (res.ok) {
       setNewComment("");
+      setComments([])
       fetchComments(); // Fetch new comments after submission
     }
   };
@@ -309,15 +313,7 @@ export default function DetailLaporanPage() {
           ref={commentsEndRef}
         >
           {comments.map((comment) => (
-            <div key={comment._id} className="py-3 border-gray-300">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold">{comment.user}</span>
-                <span className="text-sm text-gray-500">
-                  {new Date(comment.createdAt).toLocaleString()}
-                </span>
-              </div>
-              <p className="text-gray-700 mt-2">{comment.content}</p>
-            </div>
+            <CommentsSection key={comment._id + Math.random()} p={post} comment={comment} user={user}/>
           ))}
           {loading && (
             <div className="space-y-2">

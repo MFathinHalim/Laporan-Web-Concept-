@@ -54,7 +54,6 @@ function PostCard({ p, user, markAsCompleted }) {
         }
     };
 
-
     return (
         <div
             key={p._id}

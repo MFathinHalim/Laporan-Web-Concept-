@@ -136,7 +136,7 @@ class MainController {
   }
   
   static async deleteComment(comment: any) {
-    const result = await commentModel.deleteOne({ _id: comment._id });
+    const result = await commentModel.deleteOne({ _id: comment });
     if (result.deletedCount === 0) {
       throw new Error("Comment not found or already deleted");
     }

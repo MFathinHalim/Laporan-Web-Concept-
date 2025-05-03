@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import MainController from "@/controllers/post";
+import Users from "@/controllers/user";
 
 // GET all comments for a specific post
 export async function GET(
@@ -58,5 +59,44 @@ export async function POST(req: NextRequest) {
       { error: "Failed to add comment" },
       { status: 500 }
     );
+  }
+}
+const userInstance = Users.getInstances();
+
+export async function DELETE(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const commentId = searchParams.get("commentId");
+  const postId = req.nextUrl.pathname.split("/").slice(-2, -1)[0];
+
+  if (!postId) {
+    return Response.json({ error: "Missing postId" }, { status: 400 });
+  }
+
+  const headersList = req.headers;
+  const authHeader = headersList.get("authorization");
+  const token = authHeader && authHeader.split(" ")[1]; // Extract token from "Bearer <token>"
+  if (!token) {
+    return Response.json({ error: "Invalid token" }, { status: 401 });
+  }
+  const checkToken = await userInstance.checkAccessToken(token);
+  if (!checkToken) {
+    return Response.json({ error: "Invalid token" }, { status: 401 });
+  }
+
+  const post = await MainController.getById(postId);
+  if (!post) {
+    return Response.json({ error: "Post not found" }, { status: 404 });
+  }
+  //@ts-ignore
+  if (!commentId.user === checkToken.username && checkToken.atmin === false) {
+    return Response.json({ error: "Unauthorized" }, { status: 403 });
+  }
+
+  const deleteResult = await MainController.deleteComment(commentId);
+
+  if (deleteResult === 200) {
+    return Response.json({ message: "Post deleted successfully" });
+  } else {
+    return Response.json({ error: "Failed to delete post" }, { status: 500 });
   }
 }
