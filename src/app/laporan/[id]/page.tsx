@@ -278,13 +278,13 @@ export default function DetailLaporanPage() {
 
         {/* Cek jika user login */}
         {user ? (
-          <form onSubmit={handleSubmitComment} className="flex px-6 md:px-8 items-center gap-4 mx-auto">
+          <form onSubmit={handleSubmitComment} className="flex items-center gap-4 mx-auto">
             <div className="w-full relative">
               <input
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Tulis komentar..."
-                className="w-full py-3 border-b border-neutral-300 text-sm text-gray-800 focus:outline-none focus:border-b-3 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out"
+                className="w-full py-3 border-b  border-neutral-300 text-sm text-gray-800 focus:outline-none focus:border-b-3 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out"
               />
               <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
                 <Send className="text-gray-500 hover:text-blue-600 transition-all duration-200" />
@@ -302,7 +302,7 @@ export default function DetailLaporanPage() {
 
 
         <div
-          className="max-h-80 px-6 md:px-8 overflow-y-auto space-y-2 mt-4"
+          className="max-h-80 overflow-y-auto space-y-2 mt-4"
           onScroll={handleScroll}
           ref={commentsEndRef}
         >
