@@ -428,14 +428,12 @@ export default function LaporanPage() {
           <p className="text-center text-gray-400 mt-4">✅ Semua laporan telah ditampilkan</p>
         )}
       </div>
-      {user && (
         <a
           href="/tambah"
           className="fixed bottom-4 right-4 bg-gray-200 border border-gray-300 hover:bg-gray-300 font-bold p-4 rounded-full shadow-lg"
         >
           <Plus />
         </a>
-      )}
     </main>
   );
 }
