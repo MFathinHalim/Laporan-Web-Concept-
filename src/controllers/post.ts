@@ -13,6 +13,7 @@ class MainController {
       coordinates: [number, number]; // [lng, lat]
       address: string;
     };
+    userId: string;
   }) {
     const tags = (data.title.match(/#(\w+)/g) || []).map(tag =>
       tag.slice(1).toLowerCase()
@@ -22,6 +23,7 @@ class MainController {
       title: data.title,
       image: data.image,
       tags,
+      userId: data.userId,
       completed: [],
       location: data.location, // Sudah GeoJSON
       expiredAt: new Date(Date.now() + 60 * 1000), // 1 menit dari sekarang (debugging)
@@ -124,6 +126,23 @@ class MainController {
       // await mainModel.deleteOne({ _id: post._id });
     }
   }
+
+  static async deletePost(post: any) {  
+    const result = await mainModel.deleteOne({ _id: post });
+    if (result.deletedCount === 0) {
+      throw new Error("Post not found or already deleted");
+    }
+    return 200;
+  }
+  
+  static async deleteComment(comment: any) {
+    const result = await commentModel.deleteOne({ _id: comment._id });
+    if (result.deletedCount === 0) {
+      throw new Error("Comment not found or already deleted");
+    }
+    return 200;
+  }
+  
 
   static async completeIt(itemId: Types.ObjectId, userId: Types.ObjectId) {
     const item = await mainModel.findById(itemId);

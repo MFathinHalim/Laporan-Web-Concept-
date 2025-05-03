@@ -8,6 +8,7 @@ interface Data {
   image?: string;
   tags: string[];
   completed?: [];
+  userId?: Types.ObjectId;
   location?: {
     type: "Point";
     coordinates: [number, number]; // [lng, lat]
@@ -29,6 +30,7 @@ const mainSchema = new Schema<Data>(
     title: { type: String, required: true },
     image: { type: String },
     tags: [String],
+    userId: { type: Types.ObjectId, ref: "User", default: [] }, 
     completed: [{ type: Types.ObjectId, ref: "User", default: [] }], 
     location: {
       type: {

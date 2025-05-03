@@ -28,9 +28,31 @@ export default function LaporanForm({ onSuccess }: Props) {
         const isValid = title.trim() !== "" && lat.trim() !== "" && lng.trim() !== "" && address.trim() !== "";
         setIsFormValid(isValid);
     }, [formData]);
+    const refreshAccessToken = async () => {
+        try {
+            if (sessionStorage.getItem("token")) {
+                return sessionStorage.getItem("token");
+            }
 
+            const response = await fetch("/api/user/session/token/refresh", {
+                method: "POST",
+                credentials: "include",
+            });
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            sessionStorage.setItem("token", data.token);
+            return data.token;
+        } catch (error) {
+            console.error("Error refreshing access token:", error);
+            return null;
+        }
+    };
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        const tokenTemp = await refreshAccessToken();
+        if (!tokenTemp) return;
         const body = new FormData();
         body.append("title", formData.title);
         if (formData.image) body.append("image", formData.image);
@@ -39,7 +61,9 @@ export default function LaporanForm({ onSuccess }: Props) {
         body.append("address", formData.address);
 
         setIsFormValid(false)
-        await fetch("/api/post", { method: "POST", body });
+        await fetch("/api/post", {
+            method: "POST", body, headers: { Authorization: `Bearer ${tokenTemp}` },
+        });
         setFormData({ title: "", image: null, lat: "", lng: "", address: "" });
         onSuccess();
     }
@@ -105,8 +129,8 @@ export default function LaporanForm({ onSuccess }: Props) {
                     type="submit"
                     disabled={!isFormValid}
                     className={`px-6 py-2 rounded-lg shadow-sm text-white ${isFormValid
-                            ? "bg-blue-600 hover:bg-blue-700"
-                            : "bg-blue-600/20 cursor-not-allowed"
+                        ? "bg-blue-600 hover:bg-blue-700"
+                        : "bg-blue-600/20 cursor-not-allowed"
                         }`}
                 >
                     Kirim

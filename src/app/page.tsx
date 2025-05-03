@@ -15,6 +15,7 @@ import {
   XCircle
 } from "lucide-react";
 import TagComponent from "@/components/TagComponent";
+import PostCard from "@/components/PostCard";
 
 const MapReadOnly = dynamic(() => import("../components/MapReadOnly"), { ssr: false });
 
@@ -331,103 +332,26 @@ export default function LaporanPage() {
             : posts
               .filter((p) => (showCompletedOnly ? p.completed.length >= 3 : true))
               .map((p) => (
-                <div
-                  key={p._id}
-                  className="py-5 rounded-xl bg-gray-100 border-t border-b md:border-r md:border-l border-gray-200 shadow-md flex flex-col gap-4"
-                >
-                  <div
-                    className={`px-5 text-sm font-semibold flex items-center gap-1 ${p.completed.length > 3 ? "text-green-600" : "text-red-600"
-                      }`}
-                  >
-                    {p.completed.length > 3 ? (
-                      <span className="flex items-center font-semibold gap-1 text-green-600">
-                        <CheckCircle2 className="w-4 h-4" /> Selesai
-                      </span>
-                    ) : (
-                      <span className="flex items-center font-semibold gap-1 text-red-600">
-                        <XCircle className="w-4 h-4" /> Belum Selesai
-                      </span>
-                    )}
-                  </div>
-
-                  <p className="px-5 text-sm font-bold text-gray-800 whitespace-pre-line">
-                    {p.title}
-                  </p>
-
-                  <div className="md:px-5 px-0 w-full flex flex-col md:flex-row md:gap-4">
-                    {p.image && (
-                      p.image.match(/\.(mp4|webm|ogg)$/i) ? (
-                        <video
-                          src={p.image}
-                          controls
-                          className="md:rounded w-full md:w-1/2 h-auto object-cover max-h-60"
-                        />
-                      ) : (
-                        <img
-                          src={p.image}
-                          alt=""
-                          className="md:rounded w-full md:w-1/2 h-auto object-cover max-h-60"
-                        />
-                      )
-                    )}
-
-
-                    {(!p.image && p.location) && (
-                      <div className="md:flex-1 min-h-[200px] w-full md:w-1/2 overflow-hidden">
-                        <MapReadOnly
-                          lat={p.location.coordinates[1]}
-                          lng={p.location.coordinates[0]}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {p.location?.address && (
-                    <div className="px-5 text-sm text-gray-500 flex items-center gap-1">
-                      <MapPin className="w-4 h-4" /> {p.location.address}
-                    </div>
-                  )}
-
-                  <div className="px-5 text-sm text-gray-500">
-                    Tags: {p.tags.map((t) => `#${t}`).join(" ")}
-                  </div>
-
-                  <div className="px-5 flex flex-wrap gap-3 text-sm">
-                    <a
-                      href={`/laporan/${p._id}`}
-                      className="bg-black rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
-                    >
-                      <Eye className="w-4 h-4" /> Lihat Detail
-                    </a>
-
-                    {//@ts-ignore
-                      p.completed.length < 3 && user && !p.completed.includes(user._id) ? (
-                        <button
-                          onClick={() => markAsCompleted(p._id)}
-                          className="bg-green-500 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
-                        >
-                          <CheckCircle2 className="w-4 h-4" /> Selesai
-                        </button>
-                      ) : user ? (
-                        <button
-                          onClick={() => markAsCompleted(p._id)}
-                          className="bg-red-500 hover:bg-red-600 cursor-pointer rounded-lg text-white px-3 py-2 hover:underline flex items-center gap-1"
-                        >
-                          <XCircle className="w-4 h-4" /> Belum
-                        </button>
-                      ) : null
-                    }
-
-                  </div>
-                </div>
+                <PostCard key={p._id} p={p} user={user} markAsCompleted={markAsCompleted}/>
               ))}
         </div>
 
         {loading && (
-          <p className="text-center text-gray-500 mt-4">⏳ Memuat data...</p>
+          <div
+          className="p-5 rounded-xl bg-gray-100 border border-gray-200 shadow-md flex flex-col gap-4 animate-pulse"
+        >
+          <div className="h-4 w-32 bg-gray-300 rounded" />
+          <div className="h-6 w-1/2 bg-gray-300 rounded" />
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="w-full md:w-1/2 h-48 bg-gray-300 rounded" />
+            <div className="w-full md:w-1/2 h-48 bg-gray-300 rounded" />
+          </div>
+          <div className="h-4 w-40 bg-gray-300 rounded" />
+          <div className="h-8 w-full bg-gray-300 rounded" />
+        </div>
         )}
         {!hasMore && (
-          <p className="text-center text-gray-400 mt-4">✅ Semua laporan telah ditampilkan</p>
+          <p className="text-center text-gray-400 my-6">✅ Semua laporan telah ditampilkan</p>
         )}
       </div>
       <a

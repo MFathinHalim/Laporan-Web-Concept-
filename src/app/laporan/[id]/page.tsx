@@ -239,7 +239,7 @@ export default function DetailLaporanPage() {
           </div>
         </div>
       ) : post.image ? (
-        <div className="w-full max-w-2xl mx-auto mb-4 aspect-video">
+        <div className="w-full max-w-2xl mx-auto md:mx-8 mb-4 aspect-video">
           {post.image.match(/\.(mp4|webm|ogg)$/i) ? (
             <video
               src={post.image}
@@ -255,7 +255,7 @@ export default function DetailLaporanPage() {
           )}
         </div>
       ) : post.location ? (
-        <div className="h-64 md:h-96 mb-4 overflow-hidden border shadow-sm">
+        <div className="h-64 md:h-96 mb-4 md:mx-8 overflow-hidden shadow-sm">
           <MapReadOnly
             lat={post.location.coordinates[1]}
             lng={post.location.coordinates[0]}
