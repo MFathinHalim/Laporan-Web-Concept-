@@ -36,17 +36,17 @@ type Comment = {
 
 function SkeletonPage() {
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-4">
-      <div className="h-6 bg-gray-300 rounded w-40 animate-pulse" /> {/* Kembali */}
-      <div className="h-8 bg-gray-300 rounded w-1/2 animate-pulse" /> {/* Title */}
-      <div className="h-4 bg-gray-200 rounded w-32 animate-pulse" /> {/* Status */}
+    <div className="py-6 md:px-8 max-w-5xl mx-auto space-y-4">
+      <div className="h-6 mx-6 md:mx-8 bg-gray-300 rounded w-40 animate-pulse" /> {/* Kembali */}
+      <div className="h-8 mx-6 md:mx-8 bg-gray-300 rounded w-1/2 animate-pulse" /> {/* Title */}
+      <div className="h-4 mx-6 md:mx-8 bg-gray-200 rounded w-32 animate-pulse" /> {/* Status */}
 
-      <div className="w-full h-64 bg-gray-200 rounded animate-pulse" /> {/* Gambar/Peta */}
+      <div className="w-full h-64 md:mx-8 bg-gray-200 rounded animate-pulse" /> {/* Gambar/Peta */}
 
-      <div className="h-6 bg-gray-300 rounded w-32 animate-pulse" /> {/* Alamat */}
+      <div className="h-6 mx-6 md:mx-8 bg-gray-300 rounded w-32 animate-pulse" /> {/* Alamat */}
 
-      <div className="h-8 bg-gray-300 rounded w-40 animate-pulse mt-6" /> {/* Komentar Title */}
-      <div className="space-y-2">
+      <div className="h-8 mx-6 md:mx-8 bg-gray-300 rounded w-40 animate-pulse mt-6" /> {/* Komentar Title */}
+      <div className="space-y-2 px-6 md:px-8">
         {[1, 2, 3].map((_, i) => (
           <div key={i} className="p-3 rounded animate-pulse space-y-2">
             <div className="h-4 bg-gray-300 rounded w-1/4" /> {/* User */}
@@ -188,19 +188,19 @@ export default function DetailLaporanPage() {
   console.log(post)
 
   return (
-    <main className="p-6 md:p-8 max-w-5xl mx-auto">
+    <main className="py-6 max-w-5xl mx-auto">
       <button
         onClick={() => router.push("/")}
-        className="text-sm text-blue-600 hover:underline cursor-pointer mb-4 flex items-center gap-1"
+        className="text-sm px-6 md:px-8 text-blue-600 hover:underline cursor-pointer mb-4 flex items-center gap-1"
       >
         <ArrowLeft className="w-4 h-4" /> Kembali ke Beranda
       </button>
 
-      <h1 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+      <h1 className="text-2xl px-6 md:px-8 font-bold text-gray-800 mb-2 flex items-center gap-2">
         {post.title}
       </h1>
 
-      <div className="text-sm text-gray-600 mb-3 flex items-center gap-2">
+      <div className="text-sm px-6 md:px-8 text-gray-600 mb-3 flex items-center gap-2">
         Status:
         {post.completed.length >= 3 ? (
           <span className="text-green-600 font-semibold flex items-center gap-1">
@@ -215,23 +215,23 @@ export default function DetailLaporanPage() {
 
       {/* Gambar + Peta (Jika Keduanya Ada) */}
       {post.image && post.location ? (
-        <div className="grid md:grid-cols-2 gap-4 mb-4">
+        <div className="grid md:grid-cols-2 md:px-8 mb-4 md:gap-4">
           <div className="w-full h-auto aspect-video">
             {post.image.match(/\.(mp4|webm|ogg)$/i) ? (
               <video
                 src={post.image}
                 controls
-                className="w-full h-full object-cover rounded-lg shadow-sm"
+                className="w-full h-full object-cover shadow-sm"
               />
             ) : (
               <img
                 src={post.image}
                 alt="Gambar laporan"
-                className="w-full h-full object-cover rounded-lg shadow-sm"
+                className="w-full h-full object-cover shadow-sm"
               />
             )}
           </div>
-          <div className="w-full h-64 md:h-auto rounded-lg overflow-hidden border shadow-sm">
+          <div className="w-full h-64 md:h-auto overflow-hidden shadow-sm">
             <MapReadOnly
               lat={post.location.coordinates[1]}
               lng={post.location.coordinates[0]}
@@ -244,18 +244,18 @@ export default function DetailLaporanPage() {
             <video
               src={post.image}
               controls
-              className="w-full h-full object-cover rounded-lg shadow-sm"
+              className="w-full h-full object-cover shadow-sm"
             />
           ) : (
             <img
               src={post.image}
               alt="Gambar laporan"
-              className="w-full h-full object-cover rounded-lg shadow-sm"
+              className="w-full h-full object-cover shadow-sm"
             />
           )}
         </div>
       ) : post.location ? (
-        <div className="h-64 md:h-96 mb-4 rounded-lg overflow-hidden border shadow-sm">
+        <div className="h-64 md:h-96 mb-4 overflow-hidden border shadow-sm">
           <MapReadOnly
             lat={post.location.coordinates[1]}
             lng={post.location.coordinates[0]}
@@ -265,20 +265,20 @@ export default function DetailLaporanPage() {
 
 
       {post.location?.address && (
-        <div className="text-sm text-gray-500 flex items-center gap-1">
+        <div className="text-sm px-6 md:px-8 text-gray-500 flex items-center gap-1">
           <MapPin className="w-4 h-4" /> {post.location.address}
         </div>
       )}
 
       {/* Comments Section */}
-      <div className="mt-4">
+      <div className="mt-4 px-6 md:px-8">
         <h2 className="text-xl font-semibold mb-4">
           <MessageCircle className="inline w-5 h-5 text-blue-500" /> Komentar
         </h2>
 
         {/* Cek jika user login */}
         {user ? (
-          <form onSubmit={handleSubmitComment} className="flex items-center gap-4 mx-auto">
+          <form onSubmit={handleSubmitComment} className="flex px-6 md:px-8 items-center gap-4 mx-auto">
             <div className="w-full relative">
               <input
                 value={newComment}
@@ -302,7 +302,7 @@ export default function DetailLaporanPage() {
 
 
         <div
-          className="max-h-80 overflow-y-auto space-y-2 mt-4"
+          className="max-h-80 px-6 md:px-8 overflow-y-auto space-y-2 mt-4"
           onScroll={handleScroll}
           ref={commentsEndRef}
         >
