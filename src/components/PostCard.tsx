@@ -1,4 +1,4 @@
-import { CheckCircle2, Eye, MapPin, MoreVertical, Trash2, XCircle } from "lucide-react";
+import { CheckCircle2, Eye, Flag, MapPin, MoreVertical, Trash2, XCircle } from "lucide-react";
 import { useState } from "react";
 import MapReadOnly from "./MapReadOnly";
 
@@ -54,31 +54,63 @@ function PostCard({ p, user, markAsCompleted }) {
         }
     };
 
+    const handleReport = async () => {
+        const tokenTemp = await refreshAccessToken();
+        if (!tokenTemp) return;
+
+        try {
+            const res = await fetch(`/api/report/post?postId=${p._id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${tokenTemp}`, // pastikan user.token tersedia
+                },
+            });
+
+            if (!res.ok) {
+                const error = await res.json();
+                alert(`Gagal menghapus: ${error.error}`);
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert("Terjadi kesalahan saat menghapus.");
+        }
+    };
+
     return (
         <div
             key={p._id}
             className="relative py-5 rounded-xl bg-gray-100 border-t border-b md:border-r md:border-l border-gray-200 shadow-md flex flex-col gap-4"
         >
-            {user && (p.userId === user._id || user.atmin) && (
-                <div className="absolute top-2 right-2">
-                    <button
-                        onClick={() => setShowMenu(!showMenu)}
-                        className="p-1 rounded hover:bg-gray-200 cursor-pointer"
-                    >
-                        <MoreVertical className="w-5 h-5 text-gray-600" />
-                    </button>
-                    {showMenu && (
-                        <div className="absolute right-0 mt-1 bg-white border rounded shadow z-10">
+            <div className="absolute top-2 right-2">
+                <button
+                    onClick={() => setShowMenu(!showMenu)}
+                    className="p-1 rounded hover:bg-gray-200 cursor-pointer"
+                >
+                    <MoreVertical className="w-5 h-5 text-gray-600" />
+                </button>
+
+                {showMenu && (
+                    <div className="absolute right-0 mt-1 bg-white border rounded shadow z-10">
+                        <button
+                            onClick={handleReport}
+                            className="flex items-center gap-2 px-3 py-2 text-sm hover:underline cursor-pointer w-full text-left"
+                        >
+                            <Flag className="w-4 h-4" /> Report
+                        </button>
+                        {user && (p.userId === user._id || user.atmin) && (
                             <button
                                 onClick={handleDelete}
-                                className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-500 hover:underline cursor-pointer"
+                                className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-500 hover:underline cursor-pointer w-full text-left"
                             >
                                 <Trash2 className="w-4 h-4" /> Hapus
                             </button>
-                        </div>
-                    )}
-                </div>
-            )}
+                        )}                        
+                    </div>
+                )}
+            </div>
+
 
 
 

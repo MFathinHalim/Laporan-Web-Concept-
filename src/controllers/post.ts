@@ -15,7 +15,7 @@ class MainController {
     };
     userId: string;
   }) {
-    const tags = (data.title.match(/#(\w+)/g) || []).map(tag =>
+    const tags = (data.title.match(/#(\w+)/g) || []).map((tag) =>
       tag.slice(1).toLowerCase()
     );
 
@@ -41,11 +41,14 @@ class MainController {
   }
 
   static async getTag(page: number = 1, limit: number = 100) {
-    const getTags = this.get(page, limit, tagModel)
+    const getTags = this.get(page, limit, tagModel);
     return getTags;
   }
 
-  static async createComment(postId: string, data: { user: userType; content: string }) {
+  static async createComment(
+    postId: string,
+    data: { user: userType; content: string }
+  ) {
     if (!mongoose.Types.ObjectId.isValid(postId)) {
       throw new Error("Invalid Post ID");
     }
@@ -67,7 +70,11 @@ class MainController {
   }
 
   // Get comments for a specific post (with pagination)
-  static async getCommentsByPostId(postId: string, page: number = 1, limit: number = 10) {
+  static async getCommentsByPostId(
+    postId: string,
+    page: number = 1,
+    limit: number = 10
+  ) {
     if (!mongoose.Types.ObjectId.isValid(postId)) {
       throw new Error("Invalid Post ID");
     }
@@ -78,7 +85,7 @@ class MainController {
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 }); // Sort comments by creation date (latest first)
-    
+
     return comments;
   }
 
@@ -95,11 +102,15 @@ class MainController {
     return comments;
   }
 
-
-  static async get(page: number = 1, limit: number = 10, model:any = mainModel) {
+  static async get(
+    page: number = 1,
+    limit: number = 10,
+    model: any = mainModel
+  ) {
     const skip = (page - 1) * limit;
 
-    const posts = await model.find()
+    const posts = await model
+      .find()
       .sort({ _id: -1 })
       .skip(skip)
       .limit(limit)
@@ -109,7 +120,7 @@ class MainController {
   }
 
   static async getPusat(page: number = 1, limit: number = 10) {
-    const posts = this.get(page, limit, pusatModel)
+    const posts = this.get(page, limit, pusatModel);
     return posts;
   }
 
@@ -127,14 +138,14 @@ class MainController {
     }
   }
 
-  static async deletePost(post: any) {  
+  static async deletePost(post: any) {
     const result = await mainModel.deleteOne({ _id: post });
     if (result.deletedCount === 0) {
       throw new Error("Post not found or already deleted");
     }
     return 200;
   }
-  
+
   static async deleteComment(comment: any) {
     const result = await commentModel.deleteOne({ _id: comment });
     if (result.deletedCount === 0) {
@@ -142,12 +153,55 @@ class MainController {
     }
     return 200;
   }
-  
 
+  static async report(postId: any, title: string) {
+    await this.sendDiscordNotification("User melaporkan post ini", title, postId);
+    return 200;
+  }
+
+  static async sendDiscordNotification(action: string,title:string, post: any) {
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL; // Simpan di .env
+    const roleId = "1368352706552664074"; // Ganti dengan ID role yang ingin di-mention
+    const LaporinUrl = `https://laporan-web-concept.vercel.app/laporan/${post}`; // Ganti dengan URL asli
+    const waktuSekarang = new Date().toLocaleString("id-ID", {
+      timeZone: "Asia/Jakarta",
+    });
+
+    if (!webhookUrl) {
+      console.error("Webhook URL tidak ditemukan.");
+      return;
+    }
+    const embedData = {
+      content: `<@&${roleId}> 📌 **${action}**`, // Mention role
+      embeds: [
+        {
+          title: `${title}`,
+          url: LaporinUrl, // Link ke halaman artikel
+          description: `🔹 **Aksi:** ${action}\n🔹 **Tanggal:** ${waktuSekarang}`,
+          color: 0xbdc3c7,
+          footer: {
+            text: "Laporin",
+          },
+        },
+      ],
+    };
+
+    try {
+      await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(embedData),
+      });
+    } catch (err) {
+      console.error("Gagal mengirim notifikasi ke Discord:", err);
+    }
+  }
   static async completeIt(itemId: Types.ObjectId, userId: any) {
     const item = await mainModel.findById(itemId);
     if (!item) throw new Error("Item not found");
-    
+
     const userIndex = item.completed?.findIndex(
       (u: any) => String(u) === String(userId._id)
     );
@@ -158,9 +212,9 @@ class MainController {
       //@ts-ignore
       item.completed?.splice(userIndex, 1);
     }
-    
+
     await item.save();
-    
+
     return item;
   }
 
@@ -185,7 +239,8 @@ class MainController {
   static async getByTag(tag: string, page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
 
-    const posts = await mainModel.find({ tags: tag })
+    const posts = await mainModel
+      .find({ tags: tag })
       .sort({ _id: -1 })
       .skip(skip)
       .limit(limit)
@@ -196,16 +251,17 @@ class MainController {
 
   static async getUncompleted() {
     return await mainModel
-    .find({ "completed.3": { $exists: false } }) // artinya index ke-3 (user ke-4) ada → total > 3
-    .sort({ _id: -1 })
-    .exec();  }
+      .find({ "completed.3": { $exists: false } }) // artinya index ke-3 (user ke-4) ada → total > 3
+      .sort({ _id: -1 })
+      .exec();
+  }
 
   static async getCompleted() {
     return await mainModel
-    .find({ "completed.9": { $exists: true } })
-    .sort({ _id: -1 })
-    .exec();
-    }
+      .find({ "completed.9": { $exists: true } })
+      .sort({ _id: -1 })
+      .exec();
+  }
 
   static async getById(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) {

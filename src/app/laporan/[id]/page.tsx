@@ -12,7 +12,9 @@ import {
   MessageCircle,
   Send,
   Trash2,
-  MoreVertical
+  MoreVertical,
+  XCircle,
+  Flag
 } from "lucide-react";
 import CommentsSection from "@/components/CommentSection";
 
@@ -75,6 +77,35 @@ export default function DetailLaporanPage() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null); // Menyimpan user yang sedang login
   const commentsEndRef = useRef<HTMLDivElement | null>(null);
+  const [showMenu, setShowMenu] = useState(false);
+  const handleDelete = async () => {
+    const tokenTemp = await refreshAccessToken();
+    if (!tokenTemp) return;
+    const confirmDelete = window.confirm("Yakin ingin menghapus laporan ini?");
+    if (!confirmDelete) return;
+
+    try {
+      //@ts-ignore
+      const res = await fetch(`/api/post?postId=${post._id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenTemp}`, // pastikan user.token tersedia
+        },
+      });
+
+      if (res.ok) {
+        alert("Laporan berhasil dihapus.");
+        window.location.reload(); // atau panggil ulang fetch data
+      } else {
+        const error = await res.json();
+        alert(`Gagal menghapus: ${error.error}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan saat menghapus.");
+    }
+  };
   const refreshAccessToken = async () => {
     try {
       if (sessionStorage.getItem("token")) {
@@ -129,6 +160,20 @@ export default function DetailLaporanPage() {
       router.push("/login");
     }
   }, [user, router]);
+
+  async function markAsCompleted(id: string) {
+    const tokenTemp = await refreshAccessToken();
+    if (!tokenTemp) return;
+
+    const res = await fetch(`/api/post/${id}`, {
+      method: "PATCH", headers: { Authorization: `Bearer ${tokenTemp}` },
+    });
+    if (!res.ok) throw new Error("Failed to fetch posts");
+    const data = await res.json();
+    if (res.ok) {
+      setPost(data);
+    }
+  }
 
   useEffect(() => {
     async function fetchPost() {
@@ -190,7 +235,30 @@ export default function DetailLaporanPage() {
   if (!post) {
     return <SkeletonPage />;
   }
-  console.log(post)
+
+  const handleReport = async () => {
+    const tokenTemp = await refreshAccessToken();
+    if (!tokenTemp) return;
+
+    try {
+      const res = await fetch(`/api/report/post?postId=${post._id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenTemp}`, // pastikan user.token tersedia
+        },
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        alert(`Gagal menghapus: ${error.error}`);
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan saat menghapus.");
+    }
+  };
 
   return (
     <main className="py-6 max-w-5xl mx-auto">
@@ -201,22 +269,68 @@ export default function DetailLaporanPage() {
         <ArrowLeft className="w-4 h-4" /> Kembali ke Beranda
       </button>
 
-      <h1 className="text-2xl px-6 md:px-8 font-bold text-gray-800 mb-2 flex items-center gap-2">
-        {post.title}
-      </h1>
+      <div className="flex justify-between align-items-center">
+        <h1 className="text-2xl px-6 md:px-8 font-bold text-gray-800 mb-2 flex items-center gap-2">
+          {post.title}
+        </h1>
+        <div className="relative">
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="p-1 rounded hover:bg-gray-200 cursor-pointer"
+          >
+            <MoreVertical className="w-5 h-5 text-gray-600" />
+          </button>
+
+          {showMenu && (
+            <div className="absolute right-0 mt-1 bg-white border rounded shadow z-10">
+              <button
+                onClick={handleReport}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-yellow-600 hover:bg-yellow-500 hover:text-white w-full text-left"
+              >
+                <Flag className="w-4 h-4" /> Report
+              </button>
+              {user && (post.userId === user._id || user.atmin) && (
+                <button
+                  onClick={handleDelete}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-500 hover:text-white w-full text-left"
+                >
+                  <Trash2 className="w-4 h-4" /> Hapus
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="text-sm px-6 md:px-8 text-gray-600 mb-3 flex items-center gap-2">
         Status:
         {/*@ts-ignore*/}
         {post.completed.includes(post.userId) || post.completed.length > 10 ? (
           <span className="text-green-600 font-semibold flex items-center gap-1">
-            <CheckCircle2 className="w-4 h-4" /> Selesai
+            <CheckCircle2 className="w-4 h-4" /> Konfirmasi
           </span>
         ) : (
           <span className="text-yellow-600 font-semibold flex items-center gap-1">
-            <Clock className="w-4 h-4" /> Belum Selesai
+            <Clock className="w-4 h-4" /> Belum Terkonfirmasi
           </span>
         )}
+        {/*@ts-ignore*/}
+        {user && (!post.completed.includes(user._id)) ? (
+          <button
+            onClick={() => markAsCompleted(post._id)}
+            className="text-green-500 cursor-pointer rounded-lg px-3 py-2 hover:underline flex items-center gap-1"
+          >
+            Sudah selesai?
+          </button>
+          //@ts-ignore
+        ) : user && post.completed.includes(user._id) ? (
+          <button
+            onClick={() => markAsCompleted(post._id)}
+            className=" cursor-pointer rounded-lg text-red-500 px-3 py-2 hover:underline flex items-center gap-1"
+          >
+            Belum selesai?
+          </button>
+        ) : null}
       </div>
 
       {/* Gambar + Peta (Jika Keduanya Ada) */}
@@ -313,7 +427,7 @@ export default function DetailLaporanPage() {
           ref={commentsEndRef}
         >
           {comments.map((comment) => (
-            <CommentsSection key={comment._id + Math.random()} p={post} comment={comment} user={user}/>
+            <CommentsSection key={comment._id + Math.random()} p={post} comment={comment} user={user} />
           ))}
           {loading && (
             <div className="space-y-2">
