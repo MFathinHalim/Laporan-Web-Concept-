@@ -405,15 +405,10 @@ export default function DetailLaporanPage() {
                 placeholder="Tulis komentar..."
                 className="w-full py-3 border-b  border-neutral-300 text-sm text-gray-800 focus:outline-none focus:border-b-3 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out"
               />
-              <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
+              <button type="submit" className="absolute top-1/2 right-4 transform -translate-y-1/2">
                 <Send className="text-gray-500 hover:text-blue-600 transition-all duration-200" />
-              </div>
+              </button>
             </div>
-            <button
-              type="submit"
-              className="hidden"
-              aria-label="Kirim komentar"
-            ></button>
           </form>
         ) : (
           <p className="text-center text-gray-500">Masuk untuk menulis komentar.</p>
